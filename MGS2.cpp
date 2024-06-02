@@ -262,7 +262,7 @@ namespace MGS2 {
 			"MGS2.GameOver.ini",
 			"MGS2.Info.ini", "MGS2.ItemRando.ini",
 			"MGS2.NewGameInfo.ini", "MGS2.NoQuitPrompt.ini",
-			"MGS2.Options.ini",
+			"MGS2.Options.ini", "MGS2.Pentazemin.ini",
 			"MGS2.Performance.ini", "MGS2.PS2Controls.ini",
 			"MGS2.RNG.ini",
 			"MGS2.SaveLocation.ini", "MGS2.SaveMenu.ini", "MGS2.SoftReset.ini", "MGS2.Stats.ini",
@@ -314,6 +314,7 @@ namespace MGS2 {
 		EquipShortcuts::Run(Ini);
 		CutsceneSkip::Run(Ini);
 		Actions::Run(Ini);
+		Pentazemin::Run(Ini);
 	}
 
 }

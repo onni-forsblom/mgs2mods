@@ -308,6 +308,10 @@ namespace MGS2 {
 		void Run(CSimpleIniA& ini);
 	}
 
+	namespace Pentazemin {
+		void Run(CSimpleIniA& ini);
+	}
+
 	namespace Performance {
 		extern double TimerFrequency;
 		void Run(CSimpleIniA& ini);
