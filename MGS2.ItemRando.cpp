@@ -706,8 +706,7 @@ namespace MGS2::ItemRando {
 		// Cards shuffle
 		if ((CurrentSeed.CardInLoadout) && (stage == Stage::Plant)) {
 			KeyItem* cardItems[]{ &ITEM_RAIDEN_CARD1, &ITEM_RAIDEN_CARD2, &ITEM_RAIDEN_CARD3, &ITEM_RAIDEN_CARD4 };
-			//KeyItem* movingItem = &ITEM_RAIDEN_CARD;
-			for (int i = 0; i < 5; i++) {
+			for (int i = 0; i < 4; i++) {
 				KeyItem* movingItem = cardItems[i];
 				for (auto sklg : shuffledKeyLocationGroups) {
 					if (sklg->RandomItem != nullptr) continue;
@@ -1360,11 +1359,8 @@ namespace MGS2::ItemRando {
 
 
 	void Run(CSimpleIniA& ini) {
-		return;
-
 		if (ini.IsEmpty() || (!ini.GetBoolValue(Category, "Enabled", false))) return;
-		if (ConfigParser::ParseInteger<int>(ini, Category, "Version", 2, 0, INT_MAX, true) == 2) Enabled = true;
-		else return;
+		if (ConfigParser::ParseInteger<int>(ini, Category, "Version", 2, 0, INT_MAX, true) != 2) return;
 
 		RNG = std::mt19937{ RD() };
 
