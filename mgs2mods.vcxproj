@@ -159,9 +159,6 @@
       <EnableUAC>false</EnableUAC>
       <AdditionalDependencies>$(CoreLibraryDependencies);%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
-    <PreBuildEvent>
-      <Command>C:\Users\xbox\source\repos\mgs2mods\Debug\.delDebug.bat</Command>
-    </PreBuildEvent>
     <PostBuildEvent>
       <Command>
       </Command>
@@ -215,9 +212,6 @@
       <EnableUAC>false</EnableUAC>
       <SpecifySectionAttributes>%(SpecifySectionAttributes)</SpecifySectionAttributes>
     </Link>
-    <PreBuildEvent>
-      <Command>C:\Users\xbox\source\repos\mgs2mods\MGS2\.delMGS2.bat</Command>
-    </PreBuildEvent>
     <CopyFileToFolders>
       <DestinationFolders>$(OutDir)\%(RelativeDir)</DestinationFolders>
     </CopyFileToFolders>
