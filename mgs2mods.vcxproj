@@ -322,6 +322,7 @@
     <ClCompile Include="MGS2.Actions.cpp" />
     <ClCompile Include="MGS2.NewGameInfo.cpp" />
     <ClCompile Include="MGS2.Options.cpp" />
+    <ClCompile Include="MGS2.Pentazemin.cpp" />
     <ClCompile Include="MGS2.Performance.cpp" />
     <ClCompile Include="MGS2.PS2Controls.cpp" />
     <ClCompile Include="MGS2.SaveLocation.cpp" />
