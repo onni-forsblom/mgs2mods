@@ -339,6 +339,8 @@
     <ClCompile Include="MGS2.TwinSnakesInput.cpp" />
     <ClCompile Include="MGS2.VRInfo.cpp" />
     <ClCompile Include="MGS2.Style.cpp" />
+    <ClCompile Include="MGS2.InventoryData.h" />
+    <ClCompile Include="MGS2.EventLoadout.cpp" />
   </ItemGroup>
   <ItemGroup>
     <CopyFileToFolders Include="MGS2.ConfigFiles\MGS2.Caution.ini">

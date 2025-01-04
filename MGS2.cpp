@@ -65,23 +65,50 @@ namespace MGS2 {
 
 			MGS2::Stage stage = Mem::Stage();
 			switch (stage) {
+			case Stage::Tanker:
+				return *Mem::ProgressTanker;
+			case Stage::Plant:
+				return *Mem::ProgressPlant;
+			case Stage::Missions:
+				return *Mem::VRMissionID;
+			case Stage::BossSurvival:
+				return 0;
+			case Stage::TalesA:
+			case Stage::TalesB:
+			case Stage::TalesC:
+			case Stage::TalesD:
+			case Stage::TalesE:
+				talesIndex = Mem::ProgressTalesArray[0];
+				return Mem::ProgressTalesArray[talesIndex];
+			default:
+				return -1;
+			}
+		}
+
+		void SetProgress(short progress) {
+			char talesIndex;
+
+			MGS2::Stage stage = Mem::Stage();
+				switch (stage) {
 				case Stage::Tanker:
-					return *Mem::ProgressTanker;
+					*Mem::ProgressTanker = progress;
+					break;
 				case Stage::Plant:
-					return *Mem::ProgressPlant;
+					*Mem::ProgressPlant = progress;
+					break;
 				case Stage::Missions:
-					return *Mem::VRMissionID;
-				case Stage::BossSurvival:
-					return 0;
+					*Mem::VRMissionID = progress;
+					break;
 				case Stage::TalesA:
 				case Stage::TalesB:
 				case Stage::TalesC:
 				case Stage::TalesD:
 				case Stage::TalesE:
 					talesIndex = Mem::ProgressTalesArray[0];
-					return Mem::ProgressTalesArray[talesIndex];
+					Mem::ProgressTalesArray[talesIndex] = (char)progress;
+					break;
 				default:
-					return -1;
+					break;
 			}
 		}
 	}
@@ -279,7 +306,7 @@ namespace MGS2 {
 			"MGS2.Actions.ini", "MGS2.Affinity.ini", "MGS2.Ames.ini",
 			"MGS2.Caution.ini", "MGS2.CutsceneSkip.ini",
 			"MGS2.DelayedLoad.ini", "MGS2.DInputBackground.ini", "MGS2.DrebinMode.ini",
-			"MGS2.EquipShortcuts.ini",
+			"MGS2.EquipShortcuts.ini", "MGS2.EventLoadout.ini",
 			"MGS2.FirstPerson.ini",
 			"MGS2.GameOver.ini",
 			"MGS2.Info.ini", "MGS2.ItemRando.ini",
@@ -331,6 +358,7 @@ namespace MGS2 {
 		DelayedLoad::Run(Ini);
 		VRRando::Run(Ini);
 		VRInfo::Run(Ini);
+		EventLoadout::Run(Ini);
 		ItemRando::Run(Ini);
 		ItemRando3::Run(Ini);
 		Style::Run(Ini);

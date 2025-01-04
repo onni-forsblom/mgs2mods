@@ -122,6 +122,7 @@ namespace MGS2 {
 		extern tFUN_Int_Void const GclParamReadNext;
 
 		short Progress();
+		void SetProgress(short progress);
 		MGS2::Stage Stage();
 	}
 
@@ -482,6 +483,10 @@ namespace MGS2 {
 	}
 
 	namespace PS2Controls {
+		void Run(CSimpleIniA& ini);
+	}
+
+	namespace EventLoadout {
 		void Run(CSimpleIniA& ini);
 	}
 
