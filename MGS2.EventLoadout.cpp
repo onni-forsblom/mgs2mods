@@ -2,6 +2,7 @@
 #include "MGS2.framework.h"
 #include "MGS2.InventoryData.h"
 #include "regex"
+#include "set"
 
 namespace MGS2::EventLoadout {
 	const char* Category = "EventLoadout";
@@ -231,21 +232,24 @@ namespace MGS2::EventLoadout {
 				std::string value = ToLower(ini.GetValue(section.pItem, sectionKey.pItem));
 				std::string sectionKeyStr = ToLower(sectionKey.pItem);
 
-				// "weapon" and "equipment" indicate the item to have equipped
-				if (sectionKeyStr == "weapon") {
+				// Check if we want to set something other than item data (equipped item[s], progress)
+				// and act accordingly
+				const std::set<std::string> weaponEquipStrings = {"weapon", "wpn"};
+				if (weaponEquipStrings.contains(sectionKeyStr)) {
 					loadoutData.WeaponToEquip = InventoryData::WeaponMap[
 						value
 					];
 					continue;
 				}
-				if (sectionKeyStr == "equipment") {
+				const std::set<std::string> equipmentEquipStrings = {"equipment", "equip", "item"};
+				if (equipmentEquipStrings.contains(sectionKeyStr)) {
 					loadoutData.EquipmentToEquip = InventoryData::ItemMap[
 						value
 					];
 					continue;
 				}
-				// progress indicates the progress flag to set
-				if (sectionKeyStr == "progress") {
+				const std::set<std::string> progressStrings = {"progress", "flag", "progressflag"};
+				if (progressStrings.contains(sectionKeyStr)) {
 					TrySetShortFromStr(loadoutData.Progress, value);
 					continue;
 				}
