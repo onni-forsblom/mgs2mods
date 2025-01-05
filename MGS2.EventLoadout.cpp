@@ -50,8 +50,8 @@ namespace MGS2::EventLoadout {
 
 	static void SetItemsData(std::vector<ItemData> itemsData, bool isTankerOrSnakeBossSurvival = true, bool isWeapons = true) {
 
-		const short otherInventoryOffset = 0x150; // add this to tanker inventory start address to get the inventory start address for Raiden, VR and Snake Tales
-		const std::uint8_t equipmentOffset = 0x90; // add this to the inventory start address to get the equipment start address
+		const int otherInventoryOffset = 0x150; // add this to tanker inventory start address to get the inventory start address for Raiden, VR and Snake Tales
+		const int equipmentOffset = 0x90; // add this to the inventory start address to get the equipment start address
 
 		// Do math to get the inventory start address
 
@@ -63,7 +63,7 @@ namespace MGS2::EventLoadout {
 		size_t maxOffset = isWeapons ? Mem::WeaponMaxOffset : Mem::ItemMaxOffset;
 
 		for (auto &itemData : itemsData) {
-			const std::uint8_t maxItemNumber = 40; // No items beyond this number
+			const int maxItemNumber = 40; // No items beyond this number
 			if (itemData.Number > maxItemNumber) {
 				continue;
 			}
@@ -71,7 +71,7 @@ namespace MGS2::EventLoadout {
 			// Calculate the quantity address for the item and set the value 
 			// -2 indicates we do not want to change the value
 
-			const std::uint8_t itemAmountByteSize = 2;
+			const int itemAmountByteSize = 2;
 			short* itemAmountPtr = (short*)((inventoryStartPtr + itemData.Number * itemAmountByteSize));
 			if (itemData.Amount != -2) {
 				*itemAmountPtr = itemData.Amount;
@@ -105,7 +105,7 @@ namespace MGS2::EventLoadout {
 				return;
 			}
 
-			const short progress = Mem::Progress();
+			const int progress = Mem::Progress();
 
 			// If we cannot find the stage from the map, stop here
 
