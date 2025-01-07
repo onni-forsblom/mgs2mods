@@ -8,7 +8,7 @@
 namespace MGS2::EventLoadout {
 	const char* Category = "EventLoadout";
 
-	std::unordered_map<std::string, Stage> NameToStageMap{
+	static const std::unordered_map<std::string, Stage> NameToStageMap{
 		{"tanker", Stage::Tanker},
 		{"plant", Stage::Plant},
 		{"missions", Stage::Missions},
@@ -20,7 +20,7 @@ namespace MGS2::EventLoadout {
 		{"snaketalee", Stage::TalesE}
 	};
 
-	const std::unordered_map<std::string, Difficulty> NameToDifficultyMap{
+	static const std::unordered_map<std::string, Difficulty> NameToDifficultyMap{
 		{"veryeasy", Difficulty::VeryEasy},
 		{"easy", Difficulty::Easy},
 		{"normal", Difficulty::Normal},
