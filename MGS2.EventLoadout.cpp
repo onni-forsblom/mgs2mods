@@ -1,4 +1,5 @@
 // A mod by Lucky Rapidflower (2025) for bmn's ASI plugin
+#define NOMINMAX
 #include "MGS2.framework.h"
 #include "MGS2.InventoryData.h"
 #include "regex"
@@ -19,29 +20,28 @@ namespace MGS2::EventLoadout {
 		{"snaketalee", Stage::TalesE}
 	};
 
-	struct ItemData {
-		std::uint8_t Number;
-		short Amount;
-		short Capacity;
+	const std::unordered_map<std::string, Difficulty> NameToDifficultyMap{
+		{"veryeasy", Difficulty::VeryEasy},
+		{"easy", Difficulty::Easy},
+		{"normal", Difficulty::Normal},
+		{"hard", Difficulty::Hard},
+		{"extreme", Difficulty::Extreme},
+		{"e-extreme", Difficulty::EuroExtreme},
+	};
 
-		ItemData(std::uint8_t number = 255, short amount = -2, short capacity = -1)
-			: Number(number), Amount(amount), Capacity(capacity) {
-		}
+	struct ItemData {
+		std::uint8_t Number = 255;
+		short Amount = -2;
+		short Capacity = -1;
 	};
 
 	struct LoadoutData {
 		std::vector<ItemData> WeaponsData;
 		std::vector<ItemData> EquipmentData;
-		short WeaponToEquip;
-		short EquipmentToEquip;
-		short Progress;
-
-		LoadoutData() = default;
-
-		LoadoutData(std::vector<ItemData> weaponsData, std::vector<ItemData> equipmentData,
-			short weaponToEquip = -1, short equipmentToEquip = -1, short progress = -1)
-			: WeaponsData(weaponsData), EquipmentData(equipmentData), WeaponToEquip(weaponToEquip), EquipmentToEquip(equipmentToEquip), Progress(progress) {
-		}
+		short WeaponToEquip = -1;
+		short EquipmentToEquip = -1;
+		short Progress = -1;
+		std::uint8_t Difficulty = 0;
 	};
 
 
@@ -129,7 +129,7 @@ namespace MGS2::EventLoadout {
 				(stage == Stage::Tanker
 					|| characterCode == snakeBossSurvivalCharCode);
 
-			// Finally, set all the data for the items and progress
+			// Finally, set all the data for the items, progress and difficulty
 
 			SetItemsData(itemsDataIt->second.WeaponsData, isTankerOrSnakeBossSurvival);
 			SetItemsData(itemsDataIt->second.EquipmentData, isTankerOrSnakeBossSurvival, false);
@@ -143,6 +143,9 @@ namespace MGS2::EventLoadout {
 			if (itemsDataIt->second.Progress != -1) {
 				Mem::SetProgress(itemsDataIt->second.Progress);
 			}
+			if (itemsDataIt->second.Difficulty != 0) {
+				*Mem::Difficulty = itemsDataIt->second.Difficulty;
+			}
 
 		catch_mgs2(Category, "884CA0")
 	}
@@ -155,11 +158,12 @@ namespace MGS2::EventLoadout {
 		return str;
 	}
 
-	// Tries to get a short value from a string and set it to a suitable range
-	static bool TrySetShortFromStr(short& variable, const std::string& value) {
+	// Tries to get a numeric value from a string and set it to a suitable range
+	template <typename T, typename = std::enable_if_t<std::is_arithmetic_v<T>>>
+	static bool TrySetNumFromStr(T& variable, const std::string& value) {
 		try {
-			long longValue = std::stol(value);
-			variable = std::clamp(longValue, (long)SHRT_MIN, (long)SHRT_MAX);
+			int intValue = std::stoi(value);
+			variable = std::clamp(intValue, (int)std::numeric_limits<T>::min(), (int)std::numeric_limits<T>::max());
 			return true;
 		}
 		catch (...) {
@@ -216,7 +220,7 @@ namespace MGS2::EventLoadout {
 			}
 
 			short progressFlag;
-			if (!TrySetShortFromStr(progressFlag, loadoutSectionStr.substr(dotPos2 + 1))) {
+			if (!TrySetNumFromStr(progressFlag, loadoutSectionStr.substr(dotPos2 + 1))) {
 				continue;
 			}
 
@@ -232,7 +236,7 @@ namespace MGS2::EventLoadout {
 				std::string value = ToLower(ini.GetValue(section.pItem, sectionKey.pItem));
 				std::string sectionKeyStr = ToLower(sectionKey.pItem);
 
-				// Check if we want to set something other than item data (equipped item[s], progress)
+				// Check if we want to set something other than item data (equipped item[s], progress, difficulty)
 				// and act accordingly
 				const std::set<std::string> weaponEquipStrings = {"weapon", "wpn"};
 				if (weaponEquipStrings.contains(sectionKeyStr)) {
@@ -250,7 +254,12 @@ namespace MGS2::EventLoadout {
 				}
 				const std::set<std::string> progressStrings = {"progress", "flag", "progressflag"};
 				if (progressStrings.contains(sectionKeyStr)) {
-					TrySetShortFromStr(loadoutData.Progress, value);
+					TrySetNumFromStr(loadoutData.Progress, value);
+					continue;
+				}
+				const std::set<std::string> difficultyStrings = {"difficulty", "diff"};
+				if (difficultyStrings.contains(sectionKeyStr)) {
+					loadoutData.Difficulty = NameToDifficultyMap.find(value)->second;
 					continue;
 				}
 
@@ -261,7 +270,7 @@ namespace MGS2::EventLoadout {
 
 				// If the string value has no slash, set the item amount to the retrieved value
 				if (slashPos == std::string::npos) {
-					if (!TrySetShortFromStr(itemData.Amount, value)) {
+					if (!TrySetNumFromStr(itemData.Amount, value)) {
 						continue;
 					}
 				}
@@ -271,14 +280,14 @@ namespace MGS2::EventLoadout {
 				else {
 					std::string amountStr = value.substr(0, slashPos);
 					if (amountStr != "") {
-						if (!TrySetShortFromStr(itemData.Amount, amountStr)) {
+						if (!TrySetNumFromStr(itemData.Amount, amountStr)) {
 							continue;
 						}
 					}
 
 					std::string capacityStr = value.substr(slashPos + 1);
 					if (capacityStr != "") {
-						if (!TrySetShortFromStr(itemData.Capacity, capacityStr)) {
+						if (!TrySetNumFromStr(itemData.Capacity, capacityStr)) {
 							continue;
 						}
 					}
