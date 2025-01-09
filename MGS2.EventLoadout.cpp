@@ -54,7 +54,7 @@ namespace MGS2::EventLoadout {
 	};
 
 
-	std::unordered_map<MGS2::Stage, std::unordered_map<short, LoadoutData>> StageToProgressToLoadoutMap;
+	static std::unordered_map<MGS2::Stage, std::unordered_map<short, LoadoutData>> StageToProgressToLoadoutMap;
 
 
 	static void SetItemsData(std::vector<ItemData> itemsData, bool isTankerOrSnakeBossSurvival = true, bool isWeapons = true) {
@@ -224,7 +224,7 @@ namespace MGS2::EventLoadout {
 		}
 	}
 
-	bool NewGameInfoCallback() {
+	static bool NewGameInfoCallback() {
 		return !StageToProgressToLoadoutMap.empty();
 	}
 
