@@ -1,9 +1,9 @@
 // A mod by Lucky Rapidflower (2025) for bmn's ASI plugin
-#define NOMINMAX
 #include "MGS2.framework.h"
 #include "MGS2.InventoryData.h"
 #include "regex"
 #include "set"
+#include "Utils.h"
 
 namespace MGS2::EventLoadout {
 	const char* Category = "EventLoadout";
@@ -201,27 +201,6 @@ namespace MGS2::EventLoadout {
 		catch_mgs2(Category, "4E4090");
 
 		return result;
-	}
-	
-	// For turning a string lowercase
-	static std::string ToLower(std::string str) {
-		std::transform(str.begin(), str.end(), str.begin(), [](unsigned char c) {
-			return std::tolower(c);
-		});
-		return str;
-	}
-
-	// Tries to get a numeric value from a string and set it to a suitable range
-	template <typename T, typename = std::enable_if_t<std::is_arithmetic_v<T>>>
-	static bool TrySetNumFromStr(T& variable, const std::string& value) {
-		try {
-			int intValue = std::stoi(value);
-			variable = std::clamp(intValue, (int)std::numeric_limits<T>::min(), (int)std::numeric_limits<T>::max());
-			return true;
-		}
-		catch (...) {
-			return false;
-		}
 	}
 
 	static bool NewGameInfoCallback() {

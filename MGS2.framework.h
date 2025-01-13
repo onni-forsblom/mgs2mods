@@ -503,4 +503,7 @@ namespace MGS2 {
 		void Run(CSimpleIniA& ini);
 	}
 
+	namespace Pickup {
+		void Run(CSimpleIniA& ini);
+	}
 };

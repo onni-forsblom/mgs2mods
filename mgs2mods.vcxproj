@@ -296,6 +296,7 @@
     <ClInclude Include="resource.h" />
     <ClInclude Include="lib\SimpleIni\SimpleIni.h" />
     <ClInclude Include="lib\tinyfiledialogs\tinyfiledialogs.h" />
+    <ClInclude Include="Utils.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="ASI.cpp" />
@@ -341,6 +342,7 @@
     <ClCompile Include="MGS2.Style.cpp" />
     <ClCompile Include="MGS2.InventoryData.h" />
     <ClCompile Include="MGS2.EventLoadout.cpp" />
+    <ClCompile Include="MGS2.Pickup.cpp" />
   </ItemGroup>
   <ItemGroup>
     <CopyFileToFolders Include="MGS2.ConfigFiles\MGS2.Caution.ini">
