@@ -1,0 +1,701 @@
+# Main game, item pickups that appear (even on) (e-)extreme.
+# VR/alt mission and snake tales area codes start with ’a’ instead of ’w’ (e.g. strut A roof = a12a)
+
+# Tanker
+
+# Tanker start, bandage southwest
+[Pickup.w00a.-7750.178.4500]
+
+# Tanker start, chaff east second floor
+[Pickup.w00a.10000.2224.-500]
+
+# Tanker start, pentazemin northeast corner
+[Pickup.w00a.18500.178.-17500]
+
+# Tanker start bandage, northeast corner second floor
+[Pickup.w00a.16000.3178.-17000]
+
+# Tanker start, medicine top floor center (hard and (e-)extreme)
+[Pickup.w00a.0.6178.5500]
+
+# Deck-A, M9 ammo west locker
+[Pickup.w01a.4500.417.3550]
+
+# Crew's lounge, M9 ammo behind bar counter
+[Pickup.w01f.9000.217.-18500]
+
+# Crew's lounge, USP ammo down west stairs
+[Pickup.w01f.-12500.-4783.-12500]
+
+# Deck-B, M9 ammo near east entrance
+[Pickup.w01b.11000.3217.-14750]
+
+# Deck-B, USP ammo in south locker
+[Pickup.w01b.1067.3417.5500]
+
+# Deck-C, chaff in locker
+[Pickup.w01c.-1500.6424.-18160]
+
+# Deck-D, M9 ammo in food pantry
+[Pickup.w01d.7700.9217.-11850]
+
+# Deck-D, box 1 in food pantry
+[Pickup.w01d.10000.9353.-10000]
+
+# Deck-D, M9 ammo under table of dead marines
+[Pickup.w01d.-4750.9217.-13000]
+
+# Deck-D, USP ammo under westernmost table
+[Pickup.w01d.-9250.9217.-13000]
+
+# Deck-D, USP ammo watched by camera
+[Pickup.w01d.-2500.9217.-11875]
+
+# Deck-E bridge, USP ammo northwest
+[Pickup.w01e.4817.12217.-18682]
+
+# Olga, M9 ammo southeast corner (respawns)
+[Pickup.w00b.-6600.12217.-19250]
+
+# Olga, M9 ammo between boxes (respawns)
+[Pickup.w00b.-11500.12217.-13500]
+
+# Navigation deck wing, USP suppressor up the center ladder
+[Pickup.w00c.-750.24226.-13250]
+
+# Navigation deck wing, thermal goggles up the center ladder
+[Pickup.w00c.750.27724.-13000]
+
+# Navigation deck wing, wet box east end
+[Pickup.w00c.18000.13103.-15000]
+
+# Engine room, USP ammo vulcan raven room on box
+[Pickup.w02a.16224.-3782.-22618]
+
+# Engine room, M9 ammo bottom floor northwest
+[Pickup.w02a.7000.-12783.-19500]
+
+# Engine room, USP ammo second floor west
+[Pickup.w02a.-6500.-8783.-10000]
+
+# Engine room, grenade bottom floor southwest corner
+[Pickup.w02a.-12000.-12775.1000]
+
+# Engine room, USP ammo bottom floor northwest
+[Pickup.w02a.-5500.-12783.-21500]
+
+# Engine room, USP ammo sensors room on westernmost struct (respawns)
+[Pickup.w02a.-16000.-3783.-22250]
+
+# Engine room, USP ammo sensors room on easternmost struct
+[Pickup.w02a.-10000.-3783.-22500]
+
+# Deck-2 port, USP ammo near dead marine
+[Pickup.w03a.-14000.-4783.-68500]
+
+# Deck-2 port, USP ammo at junction (respawns)
+[Pickup.w03a.-17500.-4783.-125750]
+
+# Deck-2 port, USP ammo horizontal hallway
+[Pickup.w03a.-4000.-4783.-128000]
+
+# Deck-2 port, USP ammo near starboard entrance (respawns)
+[Pickup.w03a.10500.-4783.-126500]
+
+# Deck-2 starboard, M9 ammo behind pipes near entrance
+[Pickup.w03b.12300.-4783.-128750]
+
+# Deck-2 starboard, USP ammo behind pipes near guard rush
+[Pickup.w03b.12607.-4783.-100250]
+
+# Deck-2 starboard, USP ammo northeast corner
+[Pickup.w03b.15750.-4783.-128500]
+
+# Guard rush, northern USP ammo behind Snake (respawns)
+[Pickup.w03b.17250.-4783.-86000]
+
+# Guard rush, southern USP ammo behind Snake (respawns)
+[Pickup.w03b.17250.-4783.-87000]
+
+# Hold 1, M9 ammo back in the entrance
+[Pickup.w04a.7000.-4783.1750]
+
+# Hold 1, thermals top floor southwest corner
+[Pickup.w04a.-10500.-4775.-3500]
+
+# Hold 1, M9 ammo second level southwest corner
+[Pickup.w04a.-11000.-8783.-500]
+
+# Plant
+
+# Deep sea dock, thermal goggles pool
+[Pickup.w11a.-5500.-54776.26500]
+
+# Deep sea dock, shaver fenced area
+[Pickup.w11a.-10000.-45822.19000]
+
+# Deep sea dock bomb return, socom ammo next to forklift
+[Pickup.w11a.500.-44783.-500]
+
+# Deep sea dock bomb return, socom ammo next to east barrel
+[Pickup.w11a.5500.-44780.-1000]
+
+# Strut A roof, M9 ammo southeast corner
+[Pickup.w12a.-8000.5217.-2500]
+
+# Strut A roof, bandage on east box
+[Pickup.w12a.3000.6178.-6000]
+
+# Strut A roof, chaff northeast
+[Pickup.w12a.6000.5224.-13000]
+
+# Pump room, M9 ammo up east stairs
+[Pickup.w12b.6250.5217.-7875]
+
+# Pump room, M9 ammo under center desk
+[Pickup.w12b.0.217.-6250]
+
+# Pump room, socom ammo east locker in southwest corner
+[Pickup.w12b.-9500.417.-4250]
+
+# Pump room, socom ammo south room northwest corner
+[Pickup.w12b.-8500.217.1000]
+
+# Pump room, bandage in bomb crawling area
+[Pickup.w12b.-4500.178.5500]
+
+# Pump room, box 1 south room east crawling area
+[Pickup.w12b.-4750.353.11500]
+
+# Transformer room, socom ammo near node
+[Pickup.w14a.-48750.-1783.-24500]
+
+# Transformer room, socom ammo westernmost locker north
+[Pickup.w14a.-50500.417.-43125]
+
+# Transformer room, M9 ammo upper floor northeast corner
+[Pickup.w14a.-46625.218.-34875]
+
+# BC bridge, chaff
+[Pickup.w15a.-47750.224.-60000]
+
+# Dining hall, pentazemin women's bathroom westernmost stall
+[Pickup.w16a.-47125.178.-85875]
+
+# Dining hall, M9 ammo women's bathroom easternmost stall
+[Pickup.w16a.-43750.217.-85875]
+
+# Dining hall, socom ammo in men's bathroom westernmost stall
+[Pickup.w16a.-60500.217.-85875]
+
+# Dining hall, sensor B
+[Pickup.w16a.-48250.453.-104000]
+
+# Sediment pool, PSG1 ammo upper floor east
+[Pickup.w18a.8500.-783.-109500]
+
+# Sediment pool, socom ammo upper floor west
+[Pickup.w18a.-8500.-783.-109500]
+
+# Sediment pool, M9 ammo next to stairs lower floor
+[Pickup.w18a.-6500.-3783.-133500]
+
+# DE bridge, socom ammo lower floor next to Strut E
+[Pickup.w19a.12750.-4283.3500]
+
+# DE bridge, stun grenade lower floor next to Strut E
+[Pickup.w19a.13250.-4276.2750]
+
+# Parcel room, mine detector bottom floor
+[Pickup.w20a.46500.-4047.-87000]
+
+# Parcel room, box 5 northwest
+[Pickup.w20a.57500.1353.-94500]
+
+# Parcel room, stun grenade middle of the room under conveyor
+[Pickup.w20a.51500.224.-92000]
+
+# Parcel room, M4 ammo middle of the room next to boxes
+[Pickup.w20a.53500.217.-84750]
+
+# Parcel room, socom ammo west of node under shelf
+[Pickup.w20a.56000.217.-100000]
+
+# Parcel room, socom ammo under shelf near northwest entrance
+[Pickup.w20a.48000.217.-100000]
+
+# Parcel room, M9 ammo middle of the room next to boxes
+[Pickup.w20a.52000.217.-87500]
+
+# Parcel room, digital camera bottom floor
+[Pickup.w20a.42500.-4340.-96000]
+
+# Parcel room after Emma, socom ammo north of countdown start
+[Pickup.w20a.53000.-4283.-93000]
+
+# Parcel room after Emma, stinger ammo north under conveyor
+[Pickup.w20a.50000.309.-96500]
+
+# Parcel room after Emma, PSG1-T ammo southwest next to conveyor
+[Pickup.w20a.55500.217.-81500]
+
+# Heliport, claymores lower floor west end
+[Pickup.w20b.42000.5724.-99000]
+
+# Heliport, stun grenades upper floor west side
+[Pickup.w20b.47000.11724.-96250]
+
+# Heliport, box 3 upper floor southwest
+[Pickup.w20b.51500.11853.-84400]
+
+# Heliport bomb countdown, socom ammo up the stairs
+[Pickup.w20b.59000.11717.-80500]
+
+# Fatman, M9 ammo northwest
+[Pickup.w20b.66250.11717.-103500]
+
+# Fatman, socom ammo northwest
+[Pickup.w20b.49375.11717.-101750]
+Amount=1
+
+# Fatman, socom ammo southeast
+[Pickup.w20b.63625.11717.-90750]
+
+# Fatman, socom ammo southwest
+[Pickup.w20b.46000.11717.-81875]
+
+# EF bridge, AK ammo near Shell 1 core
+[Pickup.w21a.23000.-1283.-61250]
+
+# EF bridge after Emma, chaff next to Strut F
+[Pickup.w21a.58250.224.-45250]
+
+# Warehouse, M9
+[Pickup.w22a.55250.226.-23250]
+
+# Warehouse, east M9 ammo M9 room
+[Pickup.w22a.57500.217.-22250]
+
+# Warehouse, north M9 ammo M9 room
+[Pickup.w22a.56500.217.-23750]
+
+# Warehouse, socom ammo outside M9 room near vent
+[Pickup.w22a.63000.217.-25000]
+
+# Warehouse, stun grenade bottom floor
+[Pickup.w22a.52500.-4776.-33250]
+
+# Warehouse, book bottom floor on boxes
+[Pickup.w22a.53000.-2822.-29000]
+
+# Warehouse, socom ammo bottom floor on east boxes
+[Pickup.w22a.58625.-3783.-28500]
+
+# Warehouse, M9 ammo bottom floor on east boxes
+[Pickup.w22a.59000.-2783.-26000]
+
+# Warehouse, chaff bottom floor south end
+[Pickup.w22a.51000.-4776.-18625]
+
+# Warehouse, M9 ammo bottom floor southeast room under shelf
+[Pickup.w22a.57500.-4783.-23250]
+
+# Warehouse, mine detector bottom floor southeast room
+[Pickup.w22a.55375.-4547.-23625]
+
+# Warehouse, socom suppressor bottom floor southeast room after vent crawl
+[Pickup.w22a.57625.-4774.-20375]
+
+# Warehouse, socom ammo bottom floor southeast room after vent crawl
+[Pickup.w22a.54250.-4783.-19375]
+
+# Warehouse, box 2 bottom floor southwest room
+[Pickup.w22a.46500.-4647.-18750]
+
+# Warehouse, book bottom floor southwest room locked west locker
+[Pickup.w22a.45560.-4622.-21500]
+
+# Warehouse, pentazemin bottom floor southwest room northeast locker
+[Pickup.w22a.48250.-4622.-23940]
+
+# Warehouse, AK
+[Pickup.w22a.57125.-4601.-44250]
+
+# Warehouse, AK ammo replacement for AK if already picked up
+[Pickup.w22a.57125.-4783.-44250]
+
+# Warehouse, westernmost M4 ammo AK room 
+[Pickup.w22a.56750.-4783.-40500]
+
+# Warehouse, southeast AK ammo AK room  
+[Pickup.w22a.54000.-4783.-36250]
+
+# Warehouse, southwest AK ammo AK room
+[Pickup.w22a.50000.-4783.-36250]
+
+# Warehouse, northwest AK ammo AK room
+[Pickup.w22a.46875.-4783.-44250]
+
+# Warehouse, socom ammo AK room north
+[Pickup.w22a.51250.-4783.-44375]
+
+# Warehouse, C4 C4 room northeast corner
+[Pickup.w22a.58000.224.-40000]
+
+# Warehouse, C4 C4 room southwest corner north locker
+[Pickup.w22a.54060.474.-38000]
+
+# Warehouse, C4 C4 room northwest corner
+[Pickup.w22a.54250.224.-39500]
+
+# Warehouse, claymore C4 room southwest locker
+[Pickup.w22a.54060.474.-37000]
+
+# Warehouse, claymore C4 room southeast (spawns after Ames)
+[Pickup.w22a.58000.224.-37375]
+
+# Warehouse, M4
+[Pickup.w22a.43750.399.-32000]
+
+# Warehouse, replacement M4 ammo if M4 already picked up
+[Pickup.w22a.43750.217.-32000]
+
+# Warehouse, M4 ammo west of M4
+[Pickup.w22a.42500.217.-31500]
+
+# Warehouse, PSG1 ammo M4 room northwest crawlspace
+[Pickup.w22a.38250.217.-31000]
+
+# Warehouse, M4 ammo M4 room southwest locker
+[Pickup.w22a.41560.417.-28500]
+
+# Warehouse, M4 ammo M4 room southeast corner (spawns after Ames)
+[Pickup.w22a.45500.217.-28250]
+
+# Warehouse, M4 ammo M4 room near boxes (spawns after Ames)
+[Pickup.w22a.44500.217.-31000]
+
+# Warehouse, PSG1
+[Pickup.w22a.60000.399.-32000]
+
+# Warehouse, PSG1 ammo replacement for PSG1 if already picked up
+[Pickup.w22a.60000.217.-32000]
+
+# Warehouse, PSG1-T PSG1 room vent
+[Pickup.w22a.66750.399.-31000]
+
+# Warehouse, PSG1 ammo PSG1 room northwest locker
+[Pickup.w22a.58060.417.-31250]
+
+# Warehouse, PSG1 ammo outside PSG1 room northwest locker
+[Pickup.w22a.58250.217.-30250]
+
+# Warehouse, RGB6
+[Pickup.w22a.45875.453.-39375]
+
+# Warehouse, RGB6 ammo RGB6 room northeast corner
+[Pickup.w22a.49750.309.-40250]
+
+# Warehouse, RGB6 ammo RGB6 room on box
+[Pickup.w22a.47000.1309.-38250]
+
+# Warehouse, PSG1-T ammo RGB6 room southeast locked locker
+[Pickup.w22a.49940.417.-37250]
+
+# Warehouse, grenade near grenade room entrance
+[Pickup.w22a.48250.224.-20875]
+
+# Warehouse, grenade second closest to grenade room entrance
+[Pickup.w22a.47250.224.-22000]
+
+# Warehouse, grenade grenade room farthest from entrance
+[Pickup.w22a.48250.224.-23250]
+
+# Warehouse, socom ammo grenade room
+[Pickup.w22a.49500.217.-19750]
+
+# Warehouse, PSG1-T ammo grenade room northwest locker
+[Pickup.w22a.46250.417.-23940]
+
+# FA connecting bridge, chaff bottom floor southwest
+[Pickup.w23a.-13000.-4276.2000]
+
+# Shell 1 Core 1F, socom suppressor locker room south second locker from the east
+[Pickup.w24a.2250.426.-45825]
+
+# Shell 1 Core 1F, claymore locker room south third locker from the east
+[Pickup.w24a.1250.424.-45825]
+
+# Shell 1 Core 1F, book locker room south second locker from the west
+[Pickup.w24a.-750.378.-45800]
+
+# Shell 1 Core 1F, C4 locker room south westernmost locker
+[Pickup.w24a.-1750.424.-45825]
+
+# Shell 1 Core 1F, chaff locker room on box
+[Pickup.w24a.-1000.1224.-52000]
+
+# Shell 1 Core 1F, M9 ammo locker room northwest first locker from the south
+[Pickup.w24a.-3750.417.-51250]
+
+# Shell 1 Core 1F, M4 ammo locker room northwest locked locker
+[Pickup.w24a.-3750.417.-53250]
+
+# Shell 1 Core 1F, socom ammo west end
+[Pickup.w24a.-18500.-1282.-55750]
+
+# Shell 1 Core 1F, socom ammo near exit after Ames
+[Pickup.w24a.17250.-1282.-55750]
+
+# Shell 1 Core 1F, M9 ammo near exit after Ames
+[Pickup.w24a.15750.-1282.-55750]
+
+# Computer room, M9 ammo east locker first from north
+[Pickup.w24d.8625.-15583.-53000]
+
+# Computer room, bandage under middle desk
+[Pickup.w24d.0.-15822.-51250]
+
+# Computer room, mic
+[Pickup.w24d.-3500.-15811.-57500]
+
+# Computer room, box 4 near node
+[Pickup.w24d.3750.-15647.-55000]
+
+# Computer room, AK ammo near node (respawns on room load)
+[Pickup.w24d.4500.-15783.-55000]
+
+# Computer room, books on west locker (respawns on room load)
+[Pickup.w24d.-8678.-13572.-48750]
+
+# Computer room, socom ammo west locker second from south
+[Pickup.w24d.-8625.-15583.-50000]
+
+# Computer room, M4 ammo in west locker first from north (respawns on room load)
+[Pickup.w24d.-8625.-15583.-52000]
+
+# Shell 1 Core B1, stun grenade lounge westernmost locker
+[Pickup.w24b.-10500.-4076.-69100]
+
+# Shell 1 Core B1, socom ammo lounge 2nd locker from east
+[Pickup.w24b.-8500.-4083.-69100]
+
+# Shell 1 Core B1, M4 ammo in southwest corner
+[Pickup.w24b.-11250.-4281.-64000]
+
+# Hostage room, bandage southwest corner
+[Pickup.w24c.-11000.-8320.-48500]
+
+# Hostage room, thermal goggles behind podium
+[Pickup.w24c.-10000.-7276.-54500]
+
+# Shell 1-2 bridge, pentazemin
+[Pickup.w25a.-3000.678.-137000]
+
+# Shell 1-2 bridge, PSG1 ammo
+[Pickup.w25a.3000.717.-137000]
+
+# Harrier, stringer
+[Pickup.w25a.2125.-547.-147500]
+
+# Harrier, start stinger ammo
+[Pickup.w25a.-2125.-691.-145000]
+
+# Post Harrier, PSG1 ammo down stairs
+[Pickup.w25b.-1500.-5564.-156000]
+
+# Post Harrier, PSG1 ammo up stairs
+[Pickup.w25b.499.-3472.-163597]
+
+# Post Harrier, AK suppressor behind flames
+[Pickup.w25b.-2000.-3713.-163125]
+
+# KL bridge, AK ammo after drop down
+[Pickup.w25c.59000.-2782.-226500]
+
+# KL bridge, socom ammo near Strut L
+[Pickup.w25c.53250.217.-227000]
+
+# KL bridge, chaff near Strut K
+[Pickup.w25c.53500.224.-253000]
+
+# KL bridge, PSG1 ammo near Strut K
+[Pickup.w25c.50500.217.-253000]
+
+# KL bridge w/ Emma, chaff near Shell 2 Core entrance
+[Pickup.w25c.23000.-1276.-238500]
+
+# KL bridge w/ Emma, PSG1 ammo near Shell 2 Core entrance
+[Pickup.w25c.23000.-1283.-241500]
+
+# KL bridge w/ Emma, socom ammo lower bridge north end (respawns)
+[Pickup.w25c.59000.-2780.-253000]
+
+# KL bridge w/ Emma, M4 ammo lower bridge south end (respawns)
+[Pickup.w25c.58750.-2780.-236000]
+
+# Shell 2 Core 1F, socom ammo on south box
+[Pickup.w31a.3000.-783.-228500]
+
+# Shell 2 Core 1F, M9 ammo next to west stairs
+[Pickup.w31a.-6500.-1783.-228500]
+
+# Shell 2 Core 1F, chaff west end
+[Pickup.w31a.-18000.225.-236000]
+
+# Shell 2 Core 1F, M4 west end
+[Pickup.w31a.-18000.400.-234000]
+
+# Shell 2 Core 1F, M4 ammo near node
+[Pickup.w31a.-4500.217.-243750]
+
+# Shell 2 Core 1F, M4 ammo northeast corner
+[Pickup.w31a.8500.218.-252000]
+
+# Shell 2 Core 1F, RGB6 northeast corner
+[Pickup.w31a.6500.454.-252000]
+
+# Shell 2 Core 1F, nikita ammo turret room
+[Pickup.w31a.-5500.1309.-231750]
+
+# Shell 2 Core 1F, nikita ammo next to east stairs
+[Pickup.w31a.6500.-1691.-228500]
+
+# Shell 2 Core 1F, socom ammo president room
+[Pickup.w31a.625.217.-246250]
+
+# Shell 2 Core 1F, book president room crawlspace
+[Pickup.w31a.-3750.428.-237750]
+
+# Shell 2 Core 1F, stinger ammo president room crawlspace
+[Pickup.w31a.-2000.559.-238250]
+
+# Shell 2 Core 1F w/ Emma, socom ammo northwest corner
+[Pickup.w31d.-11500.218.-252000]
+
+# Shell 2 Core 1F w/ Emma, socom ammo west end
+[Pickup.w31a.-18000.218.-234000]
+
+# Shell 2 Core 1F w/ Emma, pentazemin southwest corner
+[Pickup.w31a.-12500.179.-226500]
+
+# Shell 2 Core 1F w/ Emma, M9 ammo president room northeast corner
+[Pickup.w31d.-2000.217.-245500]
+
+# Shell 2 Core 1F w/ Emma, PSG1 ammo president room
+[Pickup.w31a.4750.217.-244500]
+
+# Shell 2 Core 1F w/ Emma, AK ammo president room
+[Pickup.w31a.7500.217.-243500]
+
+# Shell 2 Core 1F w/ Emma, PSG1-T ammo president room crawlspace
+[Pickup.w31a.-2000.467.-238250]
+
+# Shell 2 Core 1F w/ Emma, RGB6 ammo president room crawlspace
+[Pickup.w31a.-3750.559.-237750]
+
+# Swimming section, NVD before nikita
+[Pickup.w31b.4250.-10276.-244750]
+
+# Swimming section, RGB6 before nikita
+[Pickup.w31b.-1500.-10047.-249500]
+
+# Swimming section, nikita (normal and harder)
+[Pickup.w31b.5000.-10047.-236250]
+
+# Swimming section, M4 ammo before two mines
+[Pickup.w31b.9500.-10283.-237500]
+
+# Swimming section, stinger ammo after Stillman's body
+[Pickup.w31b.-2000.-10191.-223000]
+
+# Swimming section, PSG1-T after Stillman's body
+[Pickup.w31b.-2000.-10101.-223000]
+
+# Swimming section, M4 ammo southwest of elevator (spawns after finding Emma)
+[Pickup.w31b.-2750.-3783.-250750]
+
+# Swimming section, grenade (unreachable?)
+[Pickup.w31b.-1500.-6249.-2335750]
+
+# Vamp room, socom ammo southwest
+[Pickup.w31c.-14000.-6033.-235000]
+
+# Vamp room, M9 ammo northwest
+[Pickup.w31c.-14000.-6033.-243250]
+
+# Vamp room, south AK/M4 ammo northeast
+[Pickup.w31c.-6000.-6033.-241500]
+
+# Vamp room, north AK/M4 ammo northeast
+[Pickup.w31c.-6000.-6033.-242500]
+
+# Vamp room, RGB6 ammo northeast
+[Pickup.w31c.-4750.-5941.-244500]
+
+# Post Vamp swimming, AK ammo west room
+[Pickup.w31c.-18000.-10533.-252500]
+
+# Post Vamp swimming, body armor northeast room
+[Pickup.w31c.-4000.-10397.-259500]
+
+# Post Vamp swimming, PSG1-T ammo southeast room
+[Pickup.w31c.-6250.-10533.-246750]
+
+# Emma room, pentazemin south
+[Pickup.w31c.-15125.-6822.-252125]
+
+# Emma room, south C4 west locker first from north
+[Pickup.w31c.-18250.-6726.-257500]
+
+# Emma room, north C4 west locker first from north
+[Pickup.w31c.-18250.-6726.-258500]
+
+# Emma room, thermals southeast locker
+[Pickup.w31c.-11250.-6726.-256500]
+
+# Emma room, book southwest locker
+[Pickup.w31c.-18250.-6772.-253500]
+
+# Sewage treatment facility, socom ammo northeast
+[Pickup.w28a.56750.218.-222250]
+
+# Emma sniping, thermals
+[Pickup.w32a.52000.-38276.-204000]
+
+# Emma sniping, pentazemin
+[Pickup.w32a.50000.-38322.-205000]
+
+# Emma sniping, PSG1 ammo
+[Pickup.w32a.54500.-38283.-204000]
+
+# Emma sniping, PSG1-T ammo
+[Pickup.w32a.57500.-38283.-208000]
+
+# Arsenal gear stomach, medicine northeast locker
+[Pickup.w41a.2500.378.-7200]
+
+# Arsenal gear jejunum, medicine lower floor northwest 
+[Pickup.w42a.9500.178.-66000]
+
+# Arsenal gear jejunum, box 5 upper floor southwest
+[Pickup.w42a.9250.4353.-13000]
+
+# RAY arena, stinger ammo northeast
+[Pickup.w46a.8000.4309.-12000]
+Amount=1
+
+# RAY arena, stinger ammo southwest
+[Pickup.w46a.-8000.4309.12000]
+
+# RAY arena, stinger ammo southeast
+[Pickup.w46a.8000.4309.12000]
+
+# RAY arena, stinger ammo east
+[Pickup.w46a.14000.4309.0]
+
+# RAY arena, stinger ammo west
+[Pickup.w46a.-14000.4309.0]
+
+# RAY arena, stinger ammo northwest
+[Pickup.w46a.-8000.4309.-12000]

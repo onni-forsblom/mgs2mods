@@ -8,9 +8,25 @@
 namespace MGS2::Pickup {
 	const char* Category = "Pickup";
 	static const int UndefId = 255;
+	static const std::unordered_map<std::string, std::string> AreaVariationToAreaCodeMap = {
+		{"w11b","w11a"}, // deep sea dock
+		{"w11c","w11a"}, // deep sea dock
+		{"w12c","w12a"}, // strut A roof
+		{"w15b","w15a"}, // BC bridge
+		{"w16b","w16a"}, // dining hall
+		{"w16c","w16a"}, // dining hall
+		{"w20c","w20b"}, // heliport
+		{"w20d","w20b"}, // heliport
+		{"w21b","w21a"}, // EF connecting bridge
+		{"w23b","w23a"}, // FA bridge
+		{"w31f","w31c"}, // shell 2 core B1 filtration chamber
+		{"w31d","w31a"}, // shell 2 core 1F
+		{"w25d","w25c"}, // KL bridge
+		{"w32b","w32a"} // Emma sniping
+	};
 
 	// Item categories
-	//  (could put this in another file and share with item rando)
+	// (could put this in another file and share with item rando)
 	enum PickupCategory : std::uint8_t {
 		Item, 
 		Ammo, // bullets basically
@@ -46,9 +62,9 @@ namespace MGS2::Pickup {
 
 	struct PickupInstanceIdentifiers {
 		std::string AreaCode;
-		float X;
-		float Y;
-		float Z;
+		int X;
+		int Y;
+		int Z;
 
 		// Define the < operator for ordering
 		bool operator<(const PickupInstanceIdentifiers& other) const {
@@ -66,13 +82,22 @@ namespace MGS2::Pickup {
 	};
 
 	struct PickupInstanceData {
-		float Xoffset = 0;
-		float Yoffset = 0;
-		float Zoffset = 0;
+		float X = std::numeric_limits<float>::lowest();
+		float Y = std::numeric_limits<float>::lowest();
+		float Z = std::numeric_limits<float>::lowest();
 		DefaultPickupData DefaultPickupDataReplacement;
 	};
 
 	static std::map<PickupInstanceIdentifiers, PickupInstanceData> PickupInstanceIdentifiersToDataMap;
+
+	// Account for areas that have slightly different variations under a different code
+	static std::string GetMainAreaCode(std::string areaCode) {
+		auto areaCodeIt = AreaVariationToAreaCodeMap.find(areaCode);
+		if (areaCodeIt != AreaVariationToAreaCodeMap.end()) {
+			return areaCodeIt->second;
+		}
+		return areaCode;
+	}
 
 	tFUN_Int_IntIntInt oFUN_00799210;
 	int hkFUN_00799210(int param_1, int param_2, int param_3) {
@@ -80,6 +105,10 @@ namespace MGS2::Pickup {
 		int result = oFUN_00799210(param_1, param_2, param_3);
 
 		try_mgs2
+
+			float& pickupX = *(float*)(param_1 + 0x230);
+			float& pickupY = *(float*)(param_1 + 0x234);
+			float& pickupZ = *(float*)(param_1 + 0x238);
 
 			// Set up variables
 
@@ -114,10 +143,7 @@ namespace MGS2::Pickup {
 
 			if (isTimedPickup == 0) {
 
-				float& pickupX = *(float*)(param_1 + 0x230);
-				float& pickupY = *(float*)(param_1 + 0x234);
-				float& pickupZ = *(float*)(param_1 + 0x238);
-				auto pickupInstanceDataIt = PickupInstanceIdentifiersToDataMap.find({Mem::AreaCode, pickupX, pickupY, pickupZ});
+				auto pickupInstanceDataIt = PickupInstanceIdentifiersToDataMap.find({GetMainAreaCode(Mem::AreaCode), (int)pickupX, (int)pickupY, (int)pickupZ});
 
 				if (pickupInstanceDataIt != PickupInstanceIdentifiersToDataMap.end()) {
 
@@ -136,9 +162,15 @@ namespace MGS2::Pickup {
 						itemCategory = pickupInstanceDataIt->second.DefaultPickupDataReplacement.NewPickupIdentifiers.Category;
 					}
 
-					pickupX += pickupInstanceDataIt->second.Xoffset;
-					pickupY += pickupInstanceDataIt->second.Yoffset;
-					pickupZ += pickupInstanceDataIt->second.Zoffset;
+					if (pickupInstanceDataIt->second.X != std::numeric_limits<float>::lowest()) {
+						pickupX = pickupInstanceDataIt->second.X;
+					}
+					if (pickupInstanceDataIt->second.Y != std::numeric_limits<float>::lowest()) {
+						pickupY = pickupInstanceDataIt->second.Y;
+					}
+					if (pickupInstanceDataIt->second.Z != std::numeric_limits<float>::lowest()) {
+						pickupZ = pickupInstanceDataIt->second.Z;
+					}
 				}
 			}
 
@@ -236,7 +268,7 @@ namespace MGS2::Pickup {
 			// remove the 'Pickup' part
 			pickupSectionWords.erase(pickupSectionWords.begin());
 
-			// Handle default pickup data here
+			// Handle default pickup here
 			if (pickupSectionWords.size() > 0
 				&& pickupSectionWords.size() < 3) {
 
@@ -249,10 +281,16 @@ namespace MGS2::Pickup {
 
 				DefaultPickupIdentifiersToDataMap[defaultPickupIdentifiers] = GetNewDefaultPickupData(ini, pickupSectionChar);
 			}
+			// Handle pickup instance here
 			else if (pickupSectionWords.size() == 4) {
-				std::string pickupAreaCode = pickupSectionWords[0];
+				// First get the main area code for the identifier
+
+				std::string pickupAreaCode = GetMainAreaCode(pickupSectionWords[0]);
 				pickupSectionWords.erase(pickupSectionWords.begin());
-				float pickupXYZ[3];
+
+				// Then X, Y and Z for the identifier
+
+				int pickupXYZ[3];
 				bool xyzSuccess = true;
 				for (int i = 0; i < 3; i++) {
 					if (!TrySetNumFromStr(pickupXYZ[i], pickupSectionWords[i])) {
@@ -263,13 +301,16 @@ namespace MGS2::Pickup {
 				if (!xyzSuccess) {
 					continue;
 				}
+
+				// Then set the instance data according to parameters
+
 				PickupInstanceIdentifiers pickupInstanceIdentifiers(pickupAreaCode, pickupXYZ[0], pickupXYZ[1], pickupXYZ[2]);
 				PickupInstanceData pickupInstanceData;
 				pickupInstanceData.DefaultPickupDataReplacement = GetNewDefaultPickupData(ini, pickupSectionChar);
 				
-				pickupInstanceData.Xoffset = ini.GetDoubleValue(pickupSectionChar, "xoffset");
-				pickupInstanceData.Yoffset = ini.GetDoubleValue(pickupSectionChar, "yoffset");
-				pickupInstanceData.Zoffset = ini.GetDoubleValue(pickupSectionChar, "zoffset");
+				pickupInstanceData.X = ini.GetDoubleValue(pickupSectionChar, "x", std::numeric_limits<float>::lowest());
+				pickupInstanceData.Y = ini.GetDoubleValue(pickupSectionChar, "y", std::numeric_limits<float>::lowest());
+				pickupInstanceData.Z = ini.GetDoubleValue(pickupSectionChar, "z", std::numeric_limits<float>::lowest());
 
 				PickupInstanceIdentifiersToDataMap[pickupInstanceIdentifiers] = pickupInstanceData;
 			}
