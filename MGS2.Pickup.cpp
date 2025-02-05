@@ -39,6 +39,14 @@ namespace MGS2::Pickup {
 		NeverSpawn
 	};
 
+	struct PickupAddresses {
+		int& Id;
+		int& Category;
+		int& Amount;
+		PickupAddresses(int param_1)
+			: Id(*(int*)(param_1 + 0x44)), Category(*(int*)(param_1 + 0x40)), Amount(*(int*)(param_1 + 0x48)) {}
+	};
+
 	struct DefaultPickupIdentifiers {
 		std::uint8_t Id = UndefId;
 		PickupCategory Category = PickupCategory::Item;
@@ -99,6 +107,20 @@ namespace MGS2::Pickup {
 		return areaCode;
 	}
 
+	static void SetDefaultPickupData(DefaultPickupData newDefaultPickupData, PickupAddresses& pickupAddresses, PickupSpawnType& newPickupSpawnType) {
+
+		newPickupSpawnType = newDefaultPickupData.SpawnType;
+
+		if (newDefaultPickupData.Amount != SHRT_MIN) { // min amount indicates to not change amount
+			pickupAddresses.Amount = newDefaultPickupData.Amount;
+		}
+
+		if (newDefaultPickupData.NewPickupIdentifiers.Id != UndefId) {
+			pickupAddresses.Id = newDefaultPickupData.NewPickupIdentifiers.Id;
+			pickupAddresses.Category = newDefaultPickupData.NewPickupIdentifiers.Category;
+		}
+	}
+
 	tFUN_Int_IntIntInt oFUN_00799210;
 	int hkFUN_00799210(int param_1, int param_2, int param_3) {
 
@@ -106,33 +128,18 @@ namespace MGS2::Pickup {
 
 		try_mgs2
 
-			float& pickupX = *(float*)(param_1 + 0x230);
-			float& pickupY = *(float*)(param_1 + 0x234);
-			float& pickupZ = *(float*)(param_1 + 0x238);
-
 			// Set up variables
 
-			int& itemId = *(int*)(param_1 + 0x44);
-			int& itemCategory = *(int*)(param_1 + 0x40);
-			int& itemAmount = *(int*)(param_1 + 0x48);
+			PickupAddresses pickupAddresses(param_1);
 			PickupSpawnType newPickupSpawnType = PickupSpawnType::Regular;
 
 			// Set the new default pickup data, if we have it for this pickup type
 
-			auto newDefaultPickupDataIt = DefaultPickupIdentifiersToDataMap.find({(std::uint8_t)itemId, (PickupCategory)itemCategory});
+			auto newDefaultPickupDataIt = DefaultPickupIdentifiersToDataMap.find(
+				{(std::uint8_t)pickupAddresses.Id, (PickupCategory)pickupAddresses.Category});
 
 			if (newDefaultPickupDataIt != DefaultPickupIdentifiersToDataMap.end()) {
-
-				newPickupSpawnType = newDefaultPickupDataIt->second.SpawnType;
-
-				if (newDefaultPickupDataIt->second.Amount != SHRT_MIN) { // min amount indicates to not change amount
-					itemAmount = newDefaultPickupDataIt->second.Amount;
-				}
-
-				if (newDefaultPickupDataIt->second.NewPickupIdentifiers.Id != UndefId) {
-					itemId = newDefaultPickupDataIt->second.NewPickupIdentifiers.Id;
-					itemCategory = newDefaultPickupDataIt->second.NewPickupIdentifiers.Category;
-				}
+				SetDefaultPickupData(newDefaultPickupDataIt->second, pickupAddresses, newPickupSpawnType);
 			}
 
 			// Set the new pickup instance data if it exists (overriding the new default data as needed)
@@ -143,24 +150,19 @@ namespace MGS2::Pickup {
 
 			if (isTimedPickup == 0) {
 
+				float& pickupX = *(float*)(param_1 + 0x230);
+				float& pickupY = *(float*)(param_1 + 0x234);
+				float& pickupZ = *(float*)(param_1 + 0x238);
+
 				auto pickupInstanceDataIt = PickupInstanceIdentifiersToDataMap.find({GetMainAreaCode(Mem::AreaCode), (int)pickupX, (int)pickupY, (int)pickupZ});
 
 				if (pickupInstanceDataIt != PickupInstanceIdentifiersToDataMap.end()) {
 
-					if (newDefaultPickupDataIt->second.SpawnType == PickupSpawnType::NeverSpawn) {
+					if (pickupInstanceDataIt->second.DefaultPickupDataReplacement.SpawnType == PickupSpawnType::NeverSpawn) {
 						return -1;
 					}
 
-					newPickupSpawnType = pickupInstanceDataIt->second.DefaultPickupDataReplacement.SpawnType;
-
-					if (pickupInstanceDataIt->second.DefaultPickupDataReplacement.Amount != SHRT_MIN) {
-						itemAmount = pickupInstanceDataIt->second.DefaultPickupDataReplacement.Amount;
-					}
-
-					if (pickupInstanceDataIt->second.DefaultPickupDataReplacement.NewPickupIdentifiers.Id != UndefId) {
-						itemId = pickupInstanceDataIt->second.DefaultPickupDataReplacement.NewPickupIdentifiers.Id;
-						itemCategory = pickupInstanceDataIt->second.DefaultPickupDataReplacement.NewPickupIdentifiers.Category;
-					}
+					SetDefaultPickupData(pickupInstanceDataIt->second.DefaultPickupDataReplacement, pickupAddresses, newPickupSpawnType);
 
 					if (pickupInstanceDataIt->second.X != std::numeric_limits<float>::lowest()) {
 						pickupX = pickupInstanceDataIt->second.X;
@@ -184,6 +186,7 @@ namespace MGS2::Pickup {
 			default:
 				break;
 			}
+
 		catch_mgs2(Category, "799210");
 
 		return result;
