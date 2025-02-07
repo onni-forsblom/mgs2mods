@@ -506,4 +506,8 @@ namespace MGS2 {
 	namespace Pickup {
 		void Run(CSimpleIniA& ini);
 	}
+
+	namespace ExploitFix {
+		void Run(CSimpleIniA& ini);
+	}
 };

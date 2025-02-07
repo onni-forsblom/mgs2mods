@@ -343,6 +343,7 @@
     <ClCompile Include="MGS2.InventoryData.h" />
     <ClCompile Include="MGS2.EventLoadout.cpp" />
     <ClCompile Include="MGS2.Pickup.cpp" />
+    <ClCompile Include="MGS2.ExploitFix.cpp" />
   </ItemGroup>
   <ItemGroup>
     <CopyFileToFolders Include="MGS2.ConfigFiles\MGS2.Caution.ini">

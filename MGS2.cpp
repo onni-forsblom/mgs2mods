@@ -306,7 +306,7 @@ namespace MGS2 {
 			"MGS2.Actions.ini", "MGS2.Affinity.ini", "MGS2.Ames.ini",
 			"MGS2.Caution.ini", "MGS2.CutsceneSkip.ini",
 			"MGS2.DelayedLoad.ini", "MGS2.DInputBackground.ini", "MGS2.DrebinMode.ini",
-			"MGS2.EquipShortcuts.ini", "MGS2.EventLoadout.ini",
+			"MGS2.EquipShortcuts.ini", "MGS2.EventLoadout.ini", "MGS2.ExploitFix.ini",
 			"MGS2.FirstPerson.ini",
 			"MGS2.GameOver.ini",
 			"MGS2.Info.ini", "MGS2.ItemRando.ini",
@@ -367,6 +367,7 @@ namespace MGS2 {
 		Actions::Run(Ini);
 		Pentazemin::Run(Ini);
 		Pickup::Run(Ini);
+		ExploitFix::Run(Ini);
 	}
 
 }
