@@ -37,6 +37,12 @@ namespace MGS2::EventLoadout {
 		{"caution", AlertMode::Caution},
 	};
 
+	static const std::unordered_map<std::string, std::uint8_t*> NameToFlagAddressMap{
+		{"itemflags", (std::uint8_t*)0x118AED4},
+		{"tankerflags", (std::uint8_t*)0x118DB21},
+		{"engineroomflags", (std::uint8_t*)0x118E4E4},
+	};
+
 	struct ItemData {
 		std::uint8_t Number = 255;
 		short Amount = -2;
@@ -51,6 +57,7 @@ namespace MGS2::EventLoadout {
 		short Progress = -1;
 		std::uint8_t Difficulty = 0;
 		std::uint8_t AlertMode = 255;
+		std::unordered_map<std::uint8_t*, std::uint8_t> FlagAddressToORMaskMap;
 	};
 
 
@@ -125,8 +132,8 @@ namespace MGS2::EventLoadout {
 
 			// If we cannot find the progress flag from the map, stop here
 
-			auto itemsDataIt = progressToLoadoutDataMapIt->second.find(progress);
-			if (itemsDataIt == progressToLoadoutDataMapIt->second.end()) {
+			auto loadoutDataIt = progressToLoadoutDataMapIt->second.find(progress);
+			if (loadoutDataIt == progressToLoadoutDataMapIt->second.end()) {
 				return;
 			}
 
@@ -140,22 +147,27 @@ namespace MGS2::EventLoadout {
 
 			// Finally, set all the data for the items, progress, difficulty and alert mode
 
-			SetItemsData(itemsDataIt->second.WeaponsData, isTankerOrSnakeBossSurvival);
-			SetItemsData(itemsDataIt->second.EquipmentData, isTankerOrSnakeBossSurvival, false);
+			SetItemsData(loadoutDataIt->second.WeaponsData, isTankerOrSnakeBossSurvival);
+			SetItemsData(loadoutDataIt->second.EquipmentData, isTankerOrSnakeBossSurvival, false);
 
-			if (itemsDataIt->second.WeaponToEquip != -1) {
-				*Mem::EquippedWeapon = itemsDataIt->second.WeaponToEquip;
+			if (loadoutDataIt->second.WeaponToEquip != -1) {
+				*Mem::EquippedWeapon = loadoutDataIt->second.WeaponToEquip;
 			}
-			if (itemsDataIt->second.EquipmentToEquip != -1) {
-				*Mem::EquippedItem = itemsDataIt->second.EquipmentToEquip;
+			if (loadoutDataIt->second.EquipmentToEquip != -1) {
+				*Mem::EquippedItem = loadoutDataIt->second.EquipmentToEquip;
 			}
-			if (itemsDataIt->second.Progress != -1) {
-				Mem::SetProgress(itemsDataIt->second.Progress);
+			if (loadoutDataIt->second.Progress != -1) {
+				Mem::SetProgress(loadoutDataIt->second.Progress);
 			}
-			if (itemsDataIt->second.Difficulty != 0) {
-				*Mem::Difficulty = itemsDataIt->second.Difficulty;
+			if (loadoutDataIt->second.Difficulty != 0) {
+				*Mem::Difficulty = loadoutDataIt->second.Difficulty;
 			}
-			AlertModeToSet = itemsDataIt->second.AlertMode;
+			AlertModeToSet = loadoutDataIt->second.AlertMode;
+
+			// Turns on the desired flags
+			for (const auto& flagAddressToORMask : loadoutDataIt->second.FlagAddressToORMaskMap) {
+				*flagAddressToORMask.first |= flagAddressToORMask.second;
+			}
 
 		catch_mgs2(Category, "884CA0")
 	}
@@ -221,7 +233,7 @@ namespace MGS2::EventLoadout {
 		NewGameInfo::AddWarning("Event Loadout", &NewGameInfoCallback);
 
 		// Define the regex pattern to match sections like [EventLoadout.Stage.Flag]
-		std::regex inventorySectionRegex(R"(^EventLoadout\.[^.]+\.\d+$)");
+		std::regex inventorySectionRegex(R"(^EventLoadout\.[^.]+\.\d+$)", std::regex_constants::icase);
 
 		// Iterate through all (EventLoadout) sections
 		std::list<CSimpleIniA::Entry> sections;
@@ -303,6 +315,14 @@ namespace MGS2::EventLoadout {
 						continue;
 					}
 					loadoutData.AlertMode = NameToAlertModeMap.find(value)->second;
+					continue;
+				}
+
+				// Sets the data for the desired flags to turn on (flags are to be written in binary)
+
+				auto NameToFlagAddressIt = NameToFlagAddressMap.find(sectionKeyStr);
+				if (NameToFlagAddressIt != NameToFlagAddressMap.end()) {
+					loadoutData.FlagAddressToORMaskMap[NameToFlagAddressIt->second] = std::stoi(value, nullptr, 2);
 					continue;
 				}
 

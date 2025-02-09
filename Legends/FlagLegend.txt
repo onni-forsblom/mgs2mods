@@ -1,0 +1,29 @@
+Flags that can be enabled with the EventLoadout mod
+NOT case sensitive
+You can add together flags to enable several at once (e.g. itemFlags = 10010000, enables both USP and Socom suppressors)
+
+itemFlags:
+    1000: non-lethal HF Blade
+   10000: suppressor on Socom
+  100000: suppressor on AK
+ 1000000: balaclava on BDU
+10000000: suppressor on USP
+It is unknown what changes 1, 10 & 100 do if any.
+
+tankerFlags:
+      10: watched Olga boss fight "conflict & victory" cutscene, can skip it
+     100: watched Olga boss fight "whoever you are" cutscene (resets at the start of the fight)
+    1000: Olga used the lamp during the boss fight (resets at the start of the fight)
+   10000: re-entered deck-E after Olga
+ 1000000: watched crew's lounge cutscene
+10000000: watched deck-B cutscene of guard in front of window
+It is unknown what changes 1 & 100000 do if any.
+
+engineRoomFlags:
+      1: west side bottom floor guard has been triggered to move (resets on room entry)
+     10: engine room has already been visited, removes guard on the east side top floor
+    100: east side top floor guard pushed over the edge
+   1000: dead marine in locker cutscene has played
+  10000: 1st laser control unit destroyed
+ 100000: 2nd laser control unit destroyed
+1000000: 3rd laser control unit destroyed
