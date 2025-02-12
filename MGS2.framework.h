@@ -509,5 +509,10 @@ namespace MGS2 {
 
 	namespace ExploitFix {
 		void Run(CSimpleIniA& ini);
+		void Run();
+	}
+
+	namespace Challenge {
+		void Run(CSimpleIniA& ini);
 	}
 };

@@ -272,6 +272,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="EventLoadout.h" />
     <ClInclude Include="lib\asprintf\asprintf.h" />
     <ClInclude Include="lib\Callback\Callback.hpp" />
     <ClInclude Include="lib\Hooking.Patterns\ConvertUTF.h" />
@@ -344,6 +345,7 @@
     <ClCompile Include="MGS2.EventLoadout.cpp" />
     <ClCompile Include="MGS2.Pickup.cpp" />
     <ClCompile Include="MGS2.ExploitFix.cpp" />
+    <ClCompile Include="MGS2.Challenge.cpp" />
   </ItemGroup>
   <ItemGroup>
     <CopyFileToFolders Include="MGS2.ConfigFiles\MGS2.Caution.ini">

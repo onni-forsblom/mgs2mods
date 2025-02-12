@@ -1,5 +1,6 @@
 // A mod by Lucky Rapidflower (2025) for bmn's ASI plugin
 #include "MGS2.framework.h"
+#include "MGS2.Pickup.h"
 #include "MGS2.InventoryData.h"
 #include "regex"
 #include "set"
@@ -7,7 +8,6 @@
 
 namespace MGS2::Pickup {
 	const char* Category = "Pickup";
-	static const int UndefId = 255;
 	static const std::unordered_map<std::string, std::string> AreaVariationToAreaCodeMap = {
 		{"w11b","w11a"}, // deep sea dock
 		{"w11c","w11a"}, // deep sea dock
@@ -25,76 +25,7 @@ namespace MGS2::Pickup {
 		{"w32b","w32a"} // Emma sniping
 	};
 
-	// Item categories
-	// (could put this in another file and share with item rando)
-	enum PickupCategory : std::uint8_t {
-		Item, 
-		Ammo, // bullets basically
-		StandaloneWeapon // weapons, grenades etc.
-	};
-
-	enum PickupSpawnType : std::uint8_t {
-		Regular,
-		Timed, // Item will despawn after a while
-		NeverSpawn
-	};
-
-	struct PickupAddresses {
-		int& Id;
-		int& Category;
-		int& Amount;
-		PickupAddresses(int param_1)
-			: Id(*(int*)(param_1 + 0x44)), Category(*(int*)(param_1 + 0x40)), Amount(*(int*)(param_1 + 0x48)) {}
-	};
-
-	struct DefaultPickupIdentifiers {
-		std::uint8_t Id = UndefId;
-		PickupCategory Category = PickupCategory::Item;
-
-		// Define the < operator for ordering
-		bool operator<(const DefaultPickupIdentifiers& other) const {
-			if (Category != other.Category) {
-				return Category < other.Category;
-			}
-			return Id < other.Id;
-		}
-	};
-
-	struct DefaultPickupData {
-		PickupSpawnType SpawnType = PickupSpawnType::Regular;
-		short Amount = SHRT_MIN;
-		DefaultPickupIdentifiers NewPickupIdentifiers;
-	};
-
 	static std::map<DefaultPickupIdentifiers, DefaultPickupData> DefaultPickupIdentifiersToDataMap;
-
-	struct PickupInstanceIdentifiers {
-		std::string AreaCode;
-		int X;
-		int Y;
-		int Z;
-
-		// Define the < operator for ordering
-		bool operator<(const PickupInstanceIdentifiers& other) const {
-			if (AreaCode != other.AreaCode) {
-				return AreaCode < other.AreaCode;
-			}
-			if (X != other.X) {
-				return X < other.X;
-			}
-			if (Y != other.Y) {
-				return Y < other.Y;
-			}
-			return Z < other.Z;
-		}
-	};
-
-	struct PickupInstanceData {
-		float X = std::numeric_limits<float>::lowest();
-		float Y = std::numeric_limits<float>::lowest();
-		float Z = std::numeric_limits<float>::lowest();
-		DefaultPickupData DefaultPickupDataReplacement;
-	};
 
 	static std::map<PickupInstanceIdentifiers, PickupInstanceData> PickupInstanceIdentifiersToDataMap;
 
@@ -246,6 +177,11 @@ namespace MGS2::Pickup {
 	}
 
 	void Run(CSimpleIniA& ini) {
+		// If there is already pickup data, do not parse the .ini file
+		if (HasNewPickupData()) {
+			return;
+		}
+
 		if (ini.IsEmpty() || (!ini.GetBoolValue(Category, "Enabled", false))) {
 			return;
 		}
@@ -318,6 +254,17 @@ namespace MGS2::Pickup {
 				PickupInstanceIdentifiersToDataMap[pickupInstanceIdentifiers] = pickupInstanceData;
 			}
 		}
+
+		// Hook function to item box spawn if there is a need
+		if (HasNewPickupData()) {
+			oFUN_00799210 = (tFUN_Int_IntIntInt)mem::TrampHook32((BYTE*)0x799210, (BYTE*)hkFUN_00799210, 6);
+		}
+	}
+
+	void Run(default_pickup_ids_to_data_map defaultPickupIdentifiersToDataMap, pickup_instance_ids_to_data_map pickupInstanceIdentifiersToDataMap)
+	{
+		DefaultPickupIdentifiersToDataMap = defaultPickupIdentifiersToDataMap;
+		PickupInstanceIdentifiersToDataMap = pickupInstanceIdentifiersToDataMap;
 
 		// Hook function to item box spawn if there is a need
 		if (HasNewPickupData()) {

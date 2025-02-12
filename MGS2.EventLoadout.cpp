@@ -1,5 +1,6 @@
 // A mod by Lucky Rapidflower (2025) for bmn's ASI plugin
 #include "MGS2.framework.h"
+#include "MGS2.EventLoadout.h"
 #include "MGS2.InventoryData.h"
 #include "regex"
 #include "set"
@@ -43,26 +44,7 @@ namespace MGS2::EventLoadout {
 		{"engineroomflags", (std::uint8_t*)0x118E4E4},
 	};
 
-	struct ItemData {
-		std::uint8_t Number = 255;
-		short Amount = -2;
-		short Capacity = -1;
-	};
-
-	struct LoadoutData {
-		std::vector<ItemData> WeaponsData;
-		std::vector<ItemData> EquipmentData;
-		short WeaponToEquip = -1;
-		short EquipmentToEquip = -1;
-		short Progress = -1;
-		std::uint8_t Difficulty = 0;
-		std::uint8_t AlertMode = 255;
-		std::unordered_map<std::uint8_t*, std::uint8_t> FlagAddressToORMaskMap;
-	};
-
-
-	static std::unordered_map<MGS2::Stage, std::unordered_map<short, LoadoutData>> StageToProgressToLoadoutMap;
-
+	static stage_to_progress_to_loadout_u_map StageToProgressToLoadoutMap;
 
 	static void SetItemsData(std::vector<ItemData> itemsData, bool isTankerOrSnakeBossSurvival = true, bool isWeapons = true) {
 
@@ -221,6 +203,12 @@ namespace MGS2::EventLoadout {
 
 	void Run(CSimpleIniA& ini) {
 
+		// If this mod is already being used by another mod, do not parse the .ini file
+
+		if (!StageToProgressToLoadoutMap.empty()) {
+			return;
+		}
+
 		// If no data has been loaded from the ini file or the mod is disabled
 		// do not go further
 		if (ini.IsEmpty() || (!ini.GetBoolValue(Category, "Enabled", false))) {
@@ -371,6 +359,20 @@ namespace MGS2::EventLoadout {
 				}
 			}
 		}
+
+		// Hook function that activates on load
+		oFUN_00884ca0 = (tFUN_Void)mem::TrampHook32((BYTE*)0x884CA0, (BYTE*)hkFUN_00884ca0, 6);
+
+		// Hook function that activates before/after running main GCL for stage
+		// but only if there is a need
+		if (needToHookForMainGCL) {
+			oFUN_004e4090 = (tFUN_Int_Int)mem::TrampHook32((BYTE*)0x4E4090, (BYTE*)hkFUN_004e4090, 8);
+		}
+	}
+
+	void Run(stage_to_progress_to_loadout_u_map stageToProgressToLoadoutMap, bool needToHookForMainGCL)
+	{
+		StageToProgressToLoadoutMap = stageToProgressToLoadoutMap;
 
 		// Hook function that activates on load
 		oFUN_00884ca0 = (tFUN_Void)mem::TrampHook32((BYTE*)0x884CA0, (BYTE*)hkFUN_00884ca0, 6);

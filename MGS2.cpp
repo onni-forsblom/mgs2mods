@@ -304,7 +304,7 @@ namespace MGS2 {
 		std::vector<const char*> iniPaths = {
 			"MGS2.ini",
 			"MGS2.Actions.ini", "MGS2.Affinity.ini", "MGS2.Ames.ini",
-			"MGS2.Caution.ini", "MGS2.CutsceneSkip.ini",
+			"MGS2.Caution.ini", "MGS2.CutsceneSkip.ini", "MGS2.Challenge.ini",
 			"MGS2.DelayedLoad.ini", "MGS2.DInputBackground.ini", "MGS2.DrebinMode.ini",
 			"MGS2.EquipShortcuts.ini", "MGS2.EventLoadout.ini", "MGS2.ExploitFix.ini",
 			"MGS2.FirstPerson.ini",
@@ -358,6 +358,7 @@ namespace MGS2 {
 		DelayedLoad::Run(Ini);
 		VRRando::Run(Ini);
 		VRInfo::Run(Ini);
+		Challenge::Run(Ini); // before EventLoadout, Pickup & ExploitFix
 		EventLoadout::Run(Ini);
 		ItemRando::Run(Ini);
 		ItemRando3::Run(Ini);
