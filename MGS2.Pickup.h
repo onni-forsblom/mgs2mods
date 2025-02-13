@@ -43,6 +43,8 @@ namespace MGS2::Pickup {
 		PickupSpawnType SpawnType = PickupSpawnType::Regular;
 		short Amount = SHRT_MIN;
 		DefaultPickupIdentifiers NewPickupIdentifiers;
+		short MinProgress = -1; // item will not spawn if progress flag is less than this
+		short MaxProgress = -1; // item will not spawn if progress flag is greater than this (ignore if -1)
 	};
 
 	struct PickupInstanceIdentifiers {

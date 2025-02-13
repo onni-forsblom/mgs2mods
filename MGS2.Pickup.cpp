@@ -39,8 +39,17 @@ namespace MGS2::Pickup {
 	}
 
 	static void SetDefaultPickupData(DefaultPickupData newDefaultPickupData, PickupAddresses& pickupAddresses, PickupSpawnType& newPickupSpawnType) {
+		int progress = Mem::Progress();
 
-		newPickupSpawnType = newDefaultPickupData.SpawnType;
+		if (
+			(progress < newDefaultPickupData.MinProgress)
+			|| ( (newDefaultPickupData.MaxProgress > -1) && (progress > newDefaultPickupData.MaxProgress) )
+		) {
+			newPickupSpawnType = NeverSpawn;
+		}
+		else {
+			newPickupSpawnType = newDefaultPickupData.SpawnType;
+		}
 
 		if (newDefaultPickupData.Amount != SHRT_MIN) { // min amount indicates to not change amount
 			pickupAddresses.Amount = newDefaultPickupData.Amount;
@@ -162,6 +171,8 @@ namespace MGS2::Pickup {
 		}
 
 		newDefaultPickupData.Amount = ConfigParser::ParseInteger(ini, pickupSectionChar, "amount", SHRT_MIN, SHRT_MIN, SHRT_MAX);
+		newDefaultPickupData.MinProgress = ConfigParser::ParseInteger(ini, pickupSectionChar, "minprogress", -1, SHRT_MIN, SHRT_MAX);
+		newDefaultPickupData.MaxProgress = ConfigParser::ParseInteger(ini, pickupSectionChar, "maxprogress", -1, SHRT_MIN, SHRT_MAX);
 
 		std::string replacementItemString = ini.GetValue(pickupSectionChar, "newitem", "");
 		if (replacementItemString != "") {
