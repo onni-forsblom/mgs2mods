@@ -2,6 +2,7 @@
 #include "MGS2.framework.h"
 #include "MGS2.EventLoadout.h"
 #include "MGS2.InventoryData.h"
+#include "MGS2.AlertModeManager.h"
 #include "regex"
 #include "set"
 #include "Utils.h"
@@ -29,13 +30,6 @@ namespace MGS2::EventLoadout {
 		{"hard", Difficulty::Hard},
 		{"extreme", Difficulty::Extreme},
 		{"e-extreme", Difficulty::EuroExtreme},
-	};
-
-	static const std::unordered_map<std::string, AlertMode::Enum> NameToAlertModeMap{
-		{"infiltration", AlertMode::Infiltration},
-		{"alert", AlertMode::Alert},
-		{"evasion", AlertMode::Evasion},
-		{"caution", AlertMode::Caution},
 	};
 
 	static const std::unordered_map<std::string, std::uint8_t*> NameToFlagAddressMap{
@@ -167,26 +161,7 @@ namespace MGS2::EventLoadout {
 				return result;
 			}
 
-			// The alert mode stored between areas
-			char& storedAlertMode = *(char*)0x118AEDC;
-
-			// If the stored alert mode is more severe than the one we want to set
-			// do not change the alert mode (e.g. do not demote from alert to caution)
-			if (storedAlertMode != AlertMode::Infiltration
-				&& storedAlertMode < AlertModeToSet) {
-				AlertModeToSet = 255;
-				return result;
-			}
-
-			// Set the alert mode that is stored between loads
-			storedAlertMode = AlertModeToSet;
-
-			// If we want to set caution mode,
-			// set the caution time that is stored between loads to 3600 frames (60 s)
-			if (AlertModeToSet == AlertMode::Caution) {
-				int& StoredCautionTime = *(int*)0xF6DE10;
-				StoredCautionTime = 3600;
-			}
+			AlertModeManager::SetStoredAlertMode(AlertModeToSet);
 
 			// Do this so as not to change alert mode with the next load
 			// unless we want to
@@ -302,7 +277,7 @@ namespace MGS2::EventLoadout {
 					if (TrySetNumFromStr(loadoutData.AlertMode, value)) {
 						continue;
 					}
-					loadoutData.AlertMode = NameToAlertModeMap.find(value)->second;
+					loadoutData.AlertMode = AlertModeManager::GetAlertModeNumFromStr(value);
 					continue;
 				}
 

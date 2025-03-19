@@ -1,4 +1,5 @@
 #include "MGS2.framework.h"
+#include "MGS2.AlertModeManager.h"
 
 namespace MGS2::Caution {
 	const char* Category = "Caution";
@@ -164,31 +165,8 @@ namespace MGS2::Caution {
 				return result;
 			}
 
-			const char* areaCode = (char*)0x118ADEC;
-			const char* characterCode = (char*)0x118C374;
-			short tankerProgress = *(short*)0x118D93C;
-			short plantProgress = *(short*)0x118D912;
-
-			// reached guard rush
-			if (strcmp(characterCode, "r_tnk0") == 0) {
-				if (tankerProgress >= 31) {
-					return result;
-				}
-			}
-
-			// in plant
-			else if (plantProgress != 0) {
-				if (
-					(plantProgress <= 21) || // in dock
-					(plantProgress == 379) || // asc colon 1
-					(plantProgress == 154) || // ames
-					(strcmp(areaCode, "w25a") == 0) || // before harrier
-					(strcmp(areaCode, "w25b") == 0) || // after harrier
-					(plantProgress >= 382) ||
-					false
-					) {
-					return result;
-				}
+			if (!AlertModeManager::CanActivateAlertMode()) {
+				return result;
 			}
 
 			//  setting <= 1  =  setting
@@ -253,6 +231,7 @@ namespace MGS2::Caution {
 		RandomSeeded = ini.GetBoolValue(randomCategory, "Seeded", RandomSeeded);
 		Actions::RegisterAction(ini, randomCategory, &ToggleRandomMode);
 
+		// maybe make this utilize the alert mode manager in the future
 		std::map<std::string, char> alertLevelMap{
 			{ "infiltration", AlertMode::Infiltration },
 			{ "alert", AlertMode::Alert },

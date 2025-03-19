@@ -515,4 +515,8 @@ namespace MGS2 {
 	namespace Challenge {
 		void Run(CSimpleIniA& ini);
 	}
+
+	namespace AlertModeMechanics {
+		void Run(CSimpleIniA& ini);
+	}
 };

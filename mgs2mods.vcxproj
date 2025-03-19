@@ -302,6 +302,7 @@
   <ItemGroup>
     <ClCompile Include="ASI.cpp" />
     <ClCompile Include="ConfigParser.cpp" />
+    <ClCompile Include="MGS2.AlertModeManager.cpp" />
     <ClCompile Include="MGS2.ItemRando.cpp" />
     <ClCompile Include="MGS2.ItemRando3.cpp" />
     <ClCompile Include="lib\tinyfiledialogs\tinyfiledialogs.c" />
@@ -346,6 +347,7 @@
     <ClCompile Include="MGS2.Pickup.cpp" />
     <ClCompile Include="MGS2.ExploitFix.cpp" />
     <ClCompile Include="MGS2.Challenge.cpp" />
+    <ClCompile Include="MGS2.AlertModeMechanics.cpp" />
   </ItemGroup>
   <ItemGroup>
     <CopyFileToFolders Include="MGS2.ConfigFiles\MGS2.Caution.ini">

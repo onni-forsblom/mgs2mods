@@ -310,6 +310,7 @@ namespace MGS2 {
 			"MGS2.FirstPerson.ini",
 			"MGS2.GameOver.ini",
 			"MGS2.Info.ini", "MGS2.ItemRando.ini",
+			"MGS2.AlertModeMechanics.ini",
 			"MGS2.NewGameInfo.ini", "MGS2.NoQuitPrompt.ini",
 			"MGS2.Options.ini", "MGS2.Pentazemin.ini",
 			"MGS2.Performance.ini", "MGS2.Pickup.ini", "MGS2.PS2Controls.ini",
@@ -369,6 +370,7 @@ namespace MGS2 {
 		Pentazemin::Run(Ini);
 		Pickup::Run(Ini);
 		ExploitFix::Run(Ini);
+		AlertModeMechanics::Run(Ini);
 	}
 
 }
