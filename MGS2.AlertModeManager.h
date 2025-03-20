@@ -10,6 +10,9 @@ namespace MGS2::AlertModeManager {
 
 	static int& InitialCautionTime = *(int*)0xF60000;
 
+	// Area? alert time (is set again on area load?)
+	static int& AlertTime = *(int*)0xA160C0;
+
 	int GetAlertModeNumFromStr(std::string alertModeStr);
 
 	// Sets the alert mode that is stored between areas. Does not demote alert mode by default.

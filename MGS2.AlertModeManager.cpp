@@ -19,8 +19,8 @@ namespace MGS2::AlertModeManager {
 		// If the stored alert mode is more severe than the one we want to set
 		// do not change the alert mode (e.g. do not demote from alert to caution)
 		if (!canDemoteAlertMode
-			&& AreaAlertMode != AlertMode::Infiltration
-			&& AreaAlertMode < newAlertMode) {
+			&& StoredAlertMode != AlertMode::Infiltration
+			&& StoredAlertMode < newAlertMode) {
 			return;
 		}
 

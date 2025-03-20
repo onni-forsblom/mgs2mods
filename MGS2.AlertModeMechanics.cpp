@@ -84,9 +84,17 @@ namespace MGS2::AlertModeMechanics {
 					int& enemyCommStatus2 = *(int*)0xA1606C;
 					int& wasGuardAlarmed = *(int*)0xA164B4;
 
+					// This makes sure an alert carries over
+					// if it started after the area transition
+					if (AlertModeManager::AlertTime > 0) {
+						storedAlertMode = AlertMode::Alert;
+
+						// For preventing unexpected behavior
+						AlertModeManager::AlertTime = 0;
+					}
 					// If a guard was radioing an alert in the previous area,
 					// start alert mode 
-					if (enemyCommStatus1 == 2) {
+					else if (enemyCommStatus1 == 2) {
 						storedAlertMode = AlertMode::Alert;
 						// also increment the alert amount stat (this address is also used by the Stats mod, move to a separate header file?)
 						*(short*)(*Mem::MainGameStats + 0x142) += 1;
