@@ -65,18 +65,19 @@ namespace MGS2::AlertModeMechanics {
 
 		try_mgs2
 
+			const char* areaCode = Mem::AreaCode;
+
 			if (Mem::Stage() == None
+				|| (strcmp(areaCode, "tales") == 0) // = snake tales "cutscenes"
 				|| !AlertModeManager::CanActivateAlertMode()) {
 				return;
 			}
-
-			const char* areaCode = Mem::AreaCode;
 
 			char& storedAlertMode = AlertModeManager::StoredAlertMode;
 
 			int& storedCautionTime = AlertModeManager::StoredCautionTime;
 
-			if (PrevAreaCode != Mem::AreaCode) {
+			if (PrevAreaCode != areaCode) {
 
 				if (AlertModeOnExitingAreaWithAlarmedGuard){
 
@@ -105,12 +106,17 @@ namespace MGS2::AlertModeMechanics {
 						||  wasGuardAlarmed) {
 						AlertModeManager::SetStoredAlertMode(AlertMode::Caution);
 					}
-
-					// Reset these variables back to their default value
-					// because the game sometimes does not
+					// Make sure cautions carry over through area transitions
+					else if (AlertModeManager::AreaCautionTime > 0
+						&& AlertModeManager::StoredAlertMode == AlertMode::Infiltration) {
+						AlertModeManager::StoredAlertMode = AlertMode::Caution;
+					}
+					// Reset these variables back to their default values
+					// so that the previous code does not cause alert modes at undesired times
 					enemyCommStatus1 = -1;
 					enemyCommStatus2 = 0;
 					wasGuardAlarmed = 0;
+					AlertModeManager::AreaCautionTime = 0;
 				}
 
 				SetCautionModeLeft();
