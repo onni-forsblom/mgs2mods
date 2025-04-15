@@ -934,6 +934,11 @@ public:
         bool *          a_pHasMultiple = NULL
         ) const;
 
+	bool GetBoolFromChar(
+		const SI_CHAR * a_pValue,
+		bool            a_bDefault = false
+	) const;
+
     /** Add or update a section or value. This will always insert
         when multiple keys are enabled.
 
@@ -2172,28 +2177,41 @@ CSimpleIniTempl<SI_CHAR,SI_STRLESS,SI_CONVERTER>::GetBoolValue(
     // return the default if we don't have a value
     const SI_CHAR * pszValue = GetValue(a_pSection, a_pKey, NULL, a_pHasMultiple);
     if (!pszValue || !*pszValue) return a_bDefault;
-
-    // we only look at the minimum number of characters
-    switch (pszValue[0]) {
-    case 't': case 'T': // true
-    case 'y': case 'Y': // yes
-    case '1':           // 1 (one)
-        return true;
-
-    case 'f': case 'F': // false
-    case 'n': case 'N': // no
-    case '0':           // 0 (zero)
-        return false;
-
-    case 'o': case 'O':
-        if (pszValue[1] == 'n' || pszValue[1] == 'N') return true;  // on
-        if (pszValue[1] == 'f' || pszValue[1] == 'F') return false; // off
-        break;
-    }
-
-    // no recognized value, return the default
-    return a_bDefault;
+	return GetBoolFromChar(pszValue, a_bDefault);
 }
+
+template<class SI_CHAR, class SI_STRLESS, class SI_CONVERTER>
+bool
+CSimpleIniTempl<SI_CHAR,SI_STRLESS,SI_CONVERTER>::GetBoolFromChar(
+	const SI_CHAR* a_pValue,
+	bool a_bDefault
+	) const
+{
+	// we only look at the minimum number of characters
+	switch (a_pValue[0]) {
+	case 't': case 'T': // true
+	case 'y': case 'Y': // yes
+	case '1':           // 1 (one)
+		return true;
+
+	case 'f': case 'F': // false
+	case 'n': case 'N': // no
+	case '0':           // 0 (zero)
+		return false;
+
+	case 'o': case 'O':
+		if (a_pValue[1] == 'n' || a_pValue[1] == 'N') return true;  // on
+		if (a_pValue[1] == 'f' || a_pValue[1] == 'F') return false; // off
+		break;
+	}
+
+	// no recognized value, return the default
+	return a_bDefault;
+}
+
+
+
+
 
 template<class SI_CHAR, class SI_STRLESS, class SI_CONVERTER>
 SI_Error 

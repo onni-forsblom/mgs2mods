@@ -38,6 +38,13 @@ namespace MGS2::EventLoadout {
 		{"engineroomflags", (std::uint8_t*)0x118E4E4},
 	};
 
+	static const std::unordered_map<std::string, short> NameToCamStatusAddressOffsetMap{
+		{"deckccam", 0},
+		{"parcelroomnwcam", 610},
+		{"parcelroomswcam", 611},
+		{"parcelroomsecam", 612}
+	};
+
 	static stage_to_progress_to_loadout_u_map StageToProgressToLoadoutMap;
 
 	static void SetItemsData(std::vector<ItemData> itemsData, bool isTankerOrSnakeBossSurvival = true, bool isWeapons = true) {
@@ -143,6 +150,27 @@ namespace MGS2::EventLoadout {
 			// Turns on the desired flags
 			for (const auto& flagAddressToORMask : loadoutDataIt->second.FlagAddressToORMaskMap) {
 				*flagAddressToORMask.first |= flagAddressToORMask.second;
+			}
+
+			// Repair/remove the desired cameras
+			for (const auto& camStatusAddressOffsetToStatus : loadoutDataIt->second.CamStatusAddressOffsetToStatusMap) {
+
+				// Calculate the camera statuses' addresses
+
+				static std::uint8_t* camStatusAddressStart = (std::uint8_t*)0x118DBD7; // (Deck-C cam status)
+				std::uint8_t* camStatusAddress = (camStatusAddressStart + camStatusAddressOffsetToStatus.first);
+				// (At least for the Deck-C camera, the second status address is 56 bytes away. For the rest, it is 3 bytes)
+				std::uint8_t* camStatus2Address = (camStatusAddressOffsetToStatus.first == 0) ? camStatusAddress + 56 : camStatusAddress + 3;
+				// If true, make the camera not broken
+				if (camStatusAddressOffsetToStatus.second) {
+					*camStatusAddress = 0;
+					*camStatus2Address = 0;
+				}
+				// Else, basically make the camera blown up
+				else {
+					*camStatusAddress = 144; // This can be other values as well but 144 seems to work
+					*camStatus2Address = 2; // 1 - regular broken camera, 2 - blown up camera
+				}
 			}
 
 		catch_mgs2(Category, "884CA0")
@@ -287,6 +315,13 @@ namespace MGS2::EventLoadout {
 				if (NameToFlagAddressIt != NameToFlagAddressMap.end()) {
 					loadoutData.FlagAddressToORMaskMap[NameToFlagAddressIt->second] = std::stoi(value, nullptr, 2);
 					continue;
+				}
+
+				// Sets the data for cameras to enable/disable
+
+				auto NameToCamAddressOffsetIt = NameToCamStatusAddressOffsetMap.find(sectionKeyStr);
+				if (NameToCamAddressOffsetIt != NameToCamStatusAddressOffsetMap.end()) {
+					loadoutData.CamStatusAddressOffsetToStatusMap[NameToCamAddressOffsetIt->second] = ini.GetBoolFromChar(value.c_str());
 				}
 
 				// Start setting data for an inventory item
