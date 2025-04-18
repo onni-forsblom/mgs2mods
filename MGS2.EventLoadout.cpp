@@ -11,6 +11,11 @@ namespace MGS2::EventLoadout {
 	const char* Category = "EventLoadout";
 	static int AlertModeToSet = 255;
 
+	// For fights like Fatman where you can gain a lot of ammo (currently just intended for a challenge mod)
+	static bool ResetAmmoAfterSpecificFights = false;
+	std::vector<ItemData> FightStartItemData;
+
+
 	static const std::unordered_map<std::string, Stage> NameToStageMap{
 		{"tanker", Stage::Tanker},
 		{"plant", Stage::Plant},
@@ -47,7 +52,8 @@ namespace MGS2::EventLoadout {
 
 	static stage_to_progress_to_loadout_u_map StageToProgressToLoadoutMap;
 
-	static void SetItemsData(std::vector<ItemData> itemsData, bool isTankerOrSnakeBossSurvival = true, bool isWeapons = true) {
+	static void SetItemsData(std::vector<ItemData> itemsData, bool isTankerOrSnakeBossSurvival = true, bool isWeapons = true,
+		bool setStoredItemsToo = false /* item values that are stored between area loads / reset to on continue */) {
 
 		const int otherInventoryOffset = 0x150; // add this to tanker inventory start address to get the inventory start address for Raiden, VR and Snake Tales
 		const int equipmentOffset = 0x90; // add this to the inventory start address to get the equipment start address
@@ -74,8 +80,13 @@ namespace MGS2::EventLoadout {
 			short* itemAmountPtr = (short*)((inventoryStartPtr + itemData.Number * itemAmountByteSize));
 			if (itemData.Amount != -2) {
 				*itemAmountPtr = itemData.Amount;
+
+				if (setStoredItemsToo) {
+					const int storedItemOffset = 0x1598;
+					short* storedItemAmountPtr = (short*)((char*)itemAmountPtr + storedItemOffset);
+					*storedItemAmountPtr = itemData.Amount;
+				}
 			}
-			
 
 			// Calculate the max capacity address for the item and set the value
 			// -1 indicates we do not want to change the value
@@ -105,6 +116,43 @@ namespace MGS2::EventLoadout {
 			}
 
 			const int progress = Mem::Progress();
+
+			if (ResetAmmoAfterSpecificFights){
+				if (stage == Stage::Plant) {
+					switch (progress)
+					{
+					// Fatman fight
+					case 118:
+						// Store the ammo amount for the Socom and M9
+						{
+							// (Make sure there is only the necessary item data)
+							FightStartItemData.clear();
+
+							ItemData socomData;
+							socomData.Number = 3;
+							socomData.Amount = *(short*)0x118B072; // Current socom ammo amount
+
+							ItemData m9Data;
+							m9Data.Number = 1;
+							m9Data.Amount = *(short*)0x118B06E; // Current M9 ammo amount
+
+							FightStartItemData = { socomData, m9Data };
+						}
+						break;
+					// After Fatman
+					case 120:
+						// Reset ammo for the Socom and M9 to pre-fight (including the amount stored between area loads)
+						if (!FightStartItemData.empty()) {
+							SetItemsData(FightStartItemData, false, true, true);
+							// (Make sure there is only the necessary item data)
+							FightStartItemData.clear();
+						}
+						break;
+					default:
+						break;
+					}
+				}
+			}
 
 			// If we cannot find the stage from the map, stop here
 
