@@ -50,6 +50,22 @@ namespace MGS2::EventLoadout {
 		{"parcelroomsecam", 612}
 	};
 
+	static const std::unordered_map<Stage, std::unordered_map<short, LocationIdentifier>> StageToProgressToSpecialEventLocationMap{
+		{
+			Plant,
+			{
+				{62, // BC bridge after Fortune cutscene
+					{
+						"w15a",
+						-54748,
+						995,
+						-45276
+					}
+				}
+			}
+		}
+	};
+
 	static stage_to_progress_to_loadout_u_map StageToProgressToLoadoutMap;
 
 	static void SetItemsData(std::vector<ItemData> itemsData, bool isTankerOrSnakeBossSurvival = true, bool isWeapons = true,
@@ -95,6 +111,44 @@ namespace MGS2::EventLoadout {
 				*itemCapacityPtr = itemData.Capacity;
 			}
 		}
+	}
+
+	// Checks if employing an event loadout should only occur at a certain player location (area & x, y, z coordinates)
+	// For cases where progress is set after a cutscene and the player character is at a specific location (for example)
+	static bool LocationDoesNotMatchSpecialEvent(const Stage stage, const int progress, bool& setStoredItemsToo) {
+
+		// If we cannot find the stage from the map, stop here
+
+		auto progressToSpecialEventLocationMapIt = StageToProgressToSpecialEventLocationMap.find(stage);
+		if (progressToSpecialEventLocationMapIt == StageToProgressToSpecialEventLocationMap.end()) {
+			return false;
+		}
+
+		// If we cannot find the progress flag from the map, stop here
+
+		auto specialEventLocationIt = progressToSpecialEventLocationMapIt->second.find(progress);
+		if (specialEventLocationIt == progressToSpecialEventLocationMapIt->second.end()) {
+			return false;
+		}
+
+		float& charX = *(float*)0xA18A00;
+		float& charY = *(float*)0xA18A04;
+		float& charZ = *(float*)0xA18A08;
+
+		const int marginOfError = 50;
+
+		// If the player character was not near the specific required location, do not employ the loadout
+		if ((strcmp(specialEventLocationIt->second.AreaCode, Mem::AreaCode) != 0)
+			|| std::abs(specialEventLocationIt->second.X - charX) > marginOfError
+			|| std::abs(specialEventLocationIt->second.Y - charY) > marginOfError
+			|| std::abs(specialEventLocationIt->second.Z - charZ) > marginOfError
+			) {
+			return true;
+		}
+
+		// Else, use the loadout (and set stored items too because player coordinates are different after a load)
+		setStoredItemsToo = true;
+		return false;
 	}
 
 	// On load
@@ -154,6 +208,12 @@ namespace MGS2::EventLoadout {
 				}
 			}
 
+			// Check if loadout should be used only at a certain location
+			bool setStoredItemsToo = false;
+			if (LocationDoesNotMatchSpecialEvent(stage, progress, setStoredItemsToo)) {
+				return;
+			}
+
 			// If we cannot find the stage from the map, stop here
 
 			auto progressToLoadoutDataMapIt = StageToProgressToLoadoutMap.find(stage);
@@ -178,8 +238,8 @@ namespace MGS2::EventLoadout {
 
 			// Finally, set all the data for the items, progress, difficulty and alert mode
 
-			SetItemsData(loadoutDataIt->second.WeaponsData, isTankerOrSnakeBossSurvival);
-			SetItemsData(loadoutDataIt->second.EquipmentData, isTankerOrSnakeBossSurvival, false);
+			SetItemsData(loadoutDataIt->second.WeaponsData, isTankerOrSnakeBossSurvival, true, setStoredItemsToo);
+			SetItemsData(loadoutDataIt->second.EquipmentData, isTankerOrSnakeBossSurvival, false, setStoredItemsToo);
 
 			if (loadoutDataIt->second.WeaponToEquip != -1) {
 				*Mem::EquippedWeapon = loadoutDataIt->second.WeaponToEquip;
