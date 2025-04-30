@@ -8,10 +8,16 @@ namespace MGS2::AlertModeMechanics {
 	const char* Category = "AlertModeMechanics";
 	static bool AlertModeOnExitingAreaWithAlarmedGuard = true;
 	static std::string PrevAreaCode = "";
+	static std::string PrevRespawnAreaCode = "";
+	static int PrevContinueAmount = -1;
 	static bool AlertModePersistsOnContinue = true;
 	static int AreaStartCautionTime;
+	static char AreaStartAlertMode;
 	static int NumberOfAreasTiedToCaution = 4;
 	std::set<std::string> CautionAreasPassed;
+	std::set<std::string> AreaStartCautionAreasPassed;
+	static char* RespawnAreaCode = (char*)0x118C384;
+	static short& ContinueAmount = *(short*)(*Mem::MainGameStats + 0x132); // (this address is also used by the Stats mod, move to a separate header file?)
 
 	// If we want to tie caution mode to areas instead of a timer,
 	// keep track of areas passed in caution here
@@ -57,6 +63,49 @@ namespace MGS2::AlertModeMechanics {
 		}
 	}
 
+	static void SetAlertModeOnExitingAreaWithAlarmedGuard() {
+		if (!AlertModeOnExitingAreaWithAlarmedGuard) {
+			return;
+		}
+
+		int& enemyCommStatus1 = *(int*)0xA16068;
+		int& enemyCommStatus2 = *(int*)0xA1606C;
+		int& wasGuardAlarmed = *(int*)0xA164B4;
+
+		// This makes sure an alert carries over
+		// if it started after the area transition
+		if (AlertModeManager::AlertTime > 0) {
+			AlertModeManager::StoredAlertMode = AlertMode::Alert;
+
+			// For preventing unexpected behavior
+			AlertModeManager::AlertTime = 0;
+		}
+		// If a guard was radioing an alert in the previous area,
+		// start alert mode 
+		else if (enemyCommStatus1 == 2) {
+			AlertModeManager::StoredAlertMode = AlertMode::Alert;
+			// also increment the alert amount stat (this address is also used by the Stats mod, move to a separate header file?)
+			*(short*)(*Mem::MainGameStats + 0x142) += 1;
+		}
+		// Else, if an enemy was radioing a caution or alarmed (but not necessarily radioing an alert),
+		// start caution mode
+		else if ((enemyCommStatus1 > 0 && enemyCommStatus2 > 0) // true when a guard is radioing a caution
+			|| wasGuardAlarmed) {
+			AlertModeManager::SetStoredAlertMode(AlertMode::Caution);
+		}
+		// Make sure cautions carry over through area transitions
+		else if (AlertModeManager::AreaCautionTime > 0
+			&& AlertModeManager::StoredAlertMode == AlertMode::Infiltration) {
+			AlertModeManager::StoredAlertMode = AlertMode::Caution;
+		}
+		// Reset these variables back to their default values
+		// so that the previous code does not cause alert modes at undesired times
+		enemyCommStatus1 = -1;
+		enemyCommStatus2 = 0;
+		wasGuardAlarmed = 0;
+		AlertModeManager::AreaCautionTime = 0;
+	}
+
 	// On load
 	tFUN_Void oFUN_00884ca0;
 	void __cdecl hkFUN_00884ca0() {
@@ -77,63 +126,40 @@ namespace MGS2::AlertModeMechanics {
 
 			int& storedCautionTime = AlertModeManager::StoredCautionTime;
 
-			if (PrevAreaCode != areaCode) {
+			if (// for checking that the area was not reloaded after a continue (enough for normal gameplay including countdown sequences)
+				(ContinueAmount == PrevContinueAmount) 
+				&& PrevAreaCode != areaCode) // for checking if the area was reloaded without a continue (like with the trainer)
+				{
 
-				if (AlertModeOnExitingAreaWithAlarmedGuard){
-
-					int& enemyCommStatus1 = *(int*)0xA16068;
-					int& enemyCommStatus2 = *(int*)0xA1606C;
-					int& wasGuardAlarmed = *(int*)0xA164B4;
-
-					// This makes sure an alert carries over
-					// if it started after the area transition
-					if (AlertModeManager::AlertTime > 0) {
-						storedAlertMode = AlertMode::Alert;
-
-						// For preventing unexpected behavior
-						AlertModeManager::AlertTime = 0;
-					}
-					// If a guard was radioing an alert in the previous area,
-					// start alert mode 
-					else if (enemyCommStatus1 == 2) {
-						storedAlertMode = AlertMode::Alert;
-						// also increment the alert amount stat (this address is also used by the Stats mod, move to a separate header file?)
-						*(short*)(*Mem::MainGameStats + 0x142) += 1;
-					}
-					// Else, if an enemy was radioing a caution or alarmed (but not necessarily radioing an alert),
-					// start caution mode
-					else if ( (enemyCommStatus1 > 0 && enemyCommStatus2 > 0) // true when a guard is radioing a caution
-						||  wasGuardAlarmed) {
-						AlertModeManager::SetStoredAlertMode(AlertMode::Caution);
-					}
-					// Make sure cautions carry over through area transitions
-					else if (AlertModeManager::AreaCautionTime > 0
-						&& AlertModeManager::StoredAlertMode == AlertMode::Infiltration) {
-						AlertModeManager::StoredAlertMode = AlertMode::Caution;
-					}
-					// Reset these variables back to their default values
-					// so that the previous code does not cause alert modes at undesired times
-					enemyCommStatus1 = -1;
-					enemyCommStatus2 = 0;
-					wasGuardAlarmed = 0;
-					AlertModeManager::AreaCautionTime = 0;
-				}
+				SetAlertModeOnExitingAreaWithAlarmedGuard();
 
 				SetCautionModeLeft();
 
-				// If we want the caution timer to reset back to what it was at the start of an area on continue,
-				// store the caution mode time here
-				AreaStartCautionTime = storedCautionTime;
+				// (For Alert Mode Persists On Continue)
+				// Store section start alert mode, caution time and caution areas passed (this last one is for countdown sequences)
+				// when respawn area changes
+				if (AlertModePersistsOnContinue
+					&& RespawnAreaCode != PrevRespawnAreaCode) {
+					AreaStartCautionTime = storedCautionTime;
+					AreaStartAlertMode = storedAlertMode;
+					AreaStartCautionAreasPassed = CautionAreasPassed;
+				}
 			}
-			// If we want caution time to reset back to area start on continue,
-			// set it here when the same area is loaded
-			else if (AlertModePersistsOnContinue
-				&& storedAlertMode == AlertMode::Caution) {
-				// Make sure there is enough time left in the caution timer,
-				// so that the player is not immediately rushed by returning attack team guards
-				storedCautionTime = (AreaStartCautionTime < 120) ? 120 : AreaStartCautionTime;
+			// Set the alert mode etc.
+			// upon reloading a section if we want to
+			else if (AlertModePersistsOnContinue) {
+				storedAlertMode = AreaStartAlertMode;
+				if (storedAlertMode == AlertMode::Caution) {
+					// (This is for countdown sequences)
+					CautionAreasPassed = AreaStartCautionAreasPassed;
+					// Make sure there is enough time left in the caution timer,
+					// so that the player is not immediately rushed by returning attack team guards
+					storedCautionTime = (AreaStartCautionTime < 120) ? 120 : AreaStartCautionTime;
+				}
 			}
-			PrevAreaCode = Mem::AreaCode;
+			PrevAreaCode = areaCode;
+			PrevRespawnAreaCode = RespawnAreaCode;
+			PrevContinueAmount = ContinueAmount;
 
 		catch_mgs2(Category, "884CA0")
 	}
@@ -169,10 +195,6 @@ namespace MGS2::AlertModeMechanics {
 
 		AlertModePersistsOnContinue = ini.GetBoolValue(Category, "AlertModePersistsOnContinue", true);
 		if (AlertModePersistsOnContinue){
-			mem::PatchSet{
-				// Remove the part of the code that resets the alert mode on continue
-				mem::Patch((void*)0x877E0E, "\x90\x90\x90\x90\x90\x90\x90\x90\x90")
-			}.Patch();
 			HookToOnLoad = true;
 		}
 
