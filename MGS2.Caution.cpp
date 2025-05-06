@@ -248,7 +248,7 @@ namespace MGS2::Caution {
 
 		Patches = mem::PatchSet({
 			// stop the timer during caution
-			mem::Patch((void*)0x42CFF9, "\x90\x90\x90\x90\x90\x90"),
+			AlertModeManager::CautionTimerFreezePatch,
 			// replace the caution timer restore with a flat 60 secs
 			mem::Patch((void*)0x42B1A0, "\x50\x66\xB8\x10\x0E\x90\xA3\xC8\x60\xA1\x00\x58", 12)
 			});

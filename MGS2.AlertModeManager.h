@@ -13,6 +13,8 @@ namespace MGS2::AlertModeManager {
 	// Area? alert time (is set again on area load?)
 	static int& AlertTime = *(int*)0xA160C0;
 
+	static const mem::Patch CautionTimerFreezePatch = mem::Patch((void*)0x42CFF9, "\x90\x90\x90\x90\x90\x90");
+
 	int GetAlertModeNumFromStr(std::string alertModeStr);
 
 	// Sets the alert mode that is stored between areas. Does not demote alert mode by default.

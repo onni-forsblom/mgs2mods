@@ -31,5 +31,5 @@ namespace MGS2::EventLoadout {
 	typedef std::unordered_map<Stage, std::unordered_map<short, LoadoutData>> stage_to_progress_to_loadout_u_map;
 
 	// For running EventLoadout from other mods
-	void Run(stage_to_progress_to_loadout_u_map stageToProgressToLoadoutMap, bool needToHookForMainGCL = true);
+	void Run(stage_to_progress_to_loadout_u_map stageToProgressToLoadoutMap, bool needToHookForMainGCL = true, bool resetAmmoAfterSpecificFights = false);
 }

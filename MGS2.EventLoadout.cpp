@@ -488,9 +488,11 @@ namespace MGS2::EventLoadout {
 		}
 	}
 
-	void Run(stage_to_progress_to_loadout_u_map stageToProgressToLoadoutMap, bool needToHookForMainGCL)
+	void Run(stage_to_progress_to_loadout_u_map stageToProgressToLoadoutMap, bool needToHookForMainGCL, bool resetAmmoAfterSpecificFights)
 	{
 		StageToProgressToLoadoutMap = stageToProgressToLoadoutMap;
+
+		ResetAmmoAfterSpecificFights = resetAmmoAfterSpecificFights;
 
 		// Hook function that activates on load
 		oFUN_00884ca0 = (tFUN_Void)mem::TrampHook32((BYTE*)0x884CA0, (BYTE*)hkFUN_00884ca0, 6);

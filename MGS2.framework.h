@@ -518,5 +518,7 @@ namespace MGS2 {
 
 	namespace AlertModeMechanics {
 		void Run(CSimpleIniA& ini);
+		void Run(bool usedByOtherMod = false, bool noExplosionInstaAlert = true, bool alertModeOnExitingAreaWithAlarmedGuard = true,
+			bool alertModePersistsOnContinue = false, int numberOfAreasTiedToCaution = 4);
 	}
 };

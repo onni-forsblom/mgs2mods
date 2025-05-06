@@ -18,6 +18,7 @@ namespace MGS2::AlertModeMechanics {
 	std::set<std::string> AreaStartCautionAreasPassed;
 	static char* RespawnAreaCode = (char*)0x118C384;
 	static short& ContinueAmount = *(short*)(*Mem::MainGameStats + 0x132); // (this address is also used by the Stats mod, move to a separate header file?)
+	static bool UsedByOtherMod = false;
 
 	// If we want to tie caution mode to areas instead of a timer,
 	// keep track of areas passed in caution here
@@ -167,13 +168,27 @@ namespace MGS2::AlertModeMechanics {
 	void Run(CSimpleIniA& ini) {
 		// If no data has been loaded from the ini file or the mod is disabled
 		// do not go further
-		if (ini.IsEmpty() || (!ini.GetBoolValue(Category, "Enabled", false))) {
+		if (UsedByOtherMod || ini.IsEmpty() || (!ini.GetBoolValue(Category, "Enabled", false))) {
 			return;
 		}
 
 		NewGameInfo::AddWarning("Alert Mode Mechanics");
 
-		if (ini.GetBoolValue(Category, "NoExplosionInstaAlert", true)) {
+		Run(
+			false,
+			ini.GetBoolValue(Category, "NoExplosionInstaAlert", true),
+			ini.GetBoolValue(Category, "AlertModeOnExitingAreaWithAlarmedGuard", true),
+			ini.GetBoolValue(Category, "AlertModePersistsOnContinue", true),
+			ini.GetLongValue(Category, "NumberOfAreasTiedToCaution", 4)
+		);
+	}
+
+	void Run(bool usedByOtherMod, bool noExplosionInstaAlert, bool alertModeOnExitingAreaWithAlarmedGuard,
+		bool alertModePersistsOnContinue, int numberOfAreasTiedToCaution) {
+
+		UsedByOtherMod = usedByOtherMod;
+
+		if (noExplosionInstaAlert) {
 			mem::PatchSet{
 				// Remove (one part of the) code that causes instant alert on explosion
 				mem::Patch((void*)0x42C74E, "\x90\x90\x90\x90\x90"),
@@ -186,28 +201,21 @@ namespace MGS2::AlertModeMechanics {
 			}.Patch();
 		}
 
-		bool HookToOnLoad = false;
+		AlertModeOnExitingAreaWithAlarmedGuard = alertModeOnExitingAreaWithAlarmedGuard;
 
-		AlertModeOnExitingAreaWithAlarmedGuard = ini.GetBoolValue(Category, "AlertModeOnExitingAreaWithAlarmedGuard", true);
-		if (AlertModeOnExitingAreaWithAlarmedGuard) {
-			HookToOnLoad = true;
-		}
+		AlertModePersistsOnContinue = alertModePersistsOnContinue;
 
-		AlertModePersistsOnContinue = ini.GetBoolValue(Category, "AlertModePersistsOnContinue", true);
-		if (AlertModePersistsOnContinue){
-			HookToOnLoad = true;
-		}
-
-		NumberOfAreasTiedToCaution = ini.GetLongValue(Category, "NumberOfAreasTiedToCaution", 4);
+		NumberOfAreasTiedToCaution = numberOfAreasTiedToCaution;
 		if (NumberOfAreasTiedToCaution > 0) {
 			mem::PatchSet({
 				// Remove the part of the code that ticks down the caution time
-				mem::Patch((void*)0x42CFF9, "\x90\x90\x90\x90\x90\x90"),
+				AlertModeManager::CautionTimerFreezePatch,
 				}).Patch();
-			HookToOnLoad = true;
 		}
 
-		if (HookToOnLoad) {
+		if (AlertModeOnExitingAreaWithAlarmedGuard
+			|| AlertModePersistsOnContinue
+			|| NumberOfAreasTiedToCaution > 0) {
 			// Hook function that activates on load
 			oFUN_00884ca0 = (tFUN_Void)mem::TrampHook32((BYTE*)0x884CA0, (BYTE*)hkFUN_00884ca0, 6);
 		}

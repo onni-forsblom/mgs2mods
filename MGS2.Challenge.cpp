@@ -24,20 +24,35 @@ namespace MGS2::Challenge {
 
 		NewGameInfo::AddWarning("Challenge");
 
-		ChallengeConfig.Content = "Lucky's Remix\nv0.1";
+		ChallengeConfig.Content = "Lucky's Remix\nv0.2";
+
+		// Set up the alert mode mechanics
+		AlertModeMechanics::Run(true);
+
+		mem::PatchSet patchSet = mem::PatchSet{
+			// Set the chaff timer to 5s
+			mem::Patch((void*)0x957349, "\x2C\x01")
+		};
+		patchSet.Patch();
 
 		// Prevent clipping into the engine room
 		ExploitFix::Run();
 
 		// EventLoadout
 
-		// let's have a look at your equipment cutscene
+		// Tanker
+
+		// "let's have a look at your equipment" cutscene
 		std::pair<short, EventLoadout::LoadoutData> tanker6loadout; 
 		tanker6loadout.first = 6;
 		tanker6loadout.second.WeaponsData = {
 			{1, 3, 15}, // M9
 			{2, -1, 15}, // USP
 			{16, 3} // magazines
+		};
+
+		tanker6loadout.second.EquipmentData = {
+			{1, 0, 2} // set ration max amount to 2
 		};
 
 		// tanker gameplay start
@@ -57,6 +72,66 @@ namespace MGS2::Challenge {
 			{(std::uint8_t*)0x118E4E4, 0b10} // engine room flags to make the guard layout the same as revisits
 		};
 
+		// Plant
+
+		// Plant gameplay start
+		std::pair<short, EventLoadout::LoadoutData> plant9loadout;
+		plant9loadout.first = 9;
+		plant9loadout.second.WeaponsData = {
+			{16, 3}, // magazines
+			{21, 2}, // books
+
+			// Set only the max capacity for these weapons
+			{1, -1, 15}, // M9
+			{3, -1, 15}, // socom
+			{15, -1, 30}, // AK
+			{18, -1, 30}, // M4
+			{4, -1, 20}, // PSG1
+			{7, -1, 20}, // Stinger (preliminary)
+			{6, -1, 20}, // Nikita (preliminary)
+			{5, -1, 18} // RGB6 (preliminary)
+		};
+
+		plant9loadout.second.EquipmentData = {
+			{1, 0, 2} // set ration max amount to 2
+		};
+
+		// BC bridge after Fortune (should set this after the Vamp cutscene but there are problems with that)
+		std::pair<short, EventLoadout::LoadoutData> plant62loadout;
+		plant62loadout.first = 62;
+		plant62loadout.second.WeaponsData = {
+			{3, 1, 15} // socom
+		};
+
+		// Fortune fight end (fix all parcel room cameras)
+		std::pair<short, EventLoadout::LoadoutData> plant115loadout;
+		plant115loadout.first = 115;
+		plant115loadout.second.CamStatusAddressOffsetToStatusMap = {
+			{610, true},
+			{611, true},
+			{612, true}
+		};
+
+		// Final bomb countdown (fix all parcel room cameras)
+		std::pair<short, EventLoadout::LoadoutData> plant120loadout;
+		plant120loadout.first = 120;
+		plant120loadout.second.CamStatusAddressOffsetToStatusMap = {
+			{610, true},
+			{611, true},
+			{612, true}
+		};
+
+		// Outside hostage room after Ames (fix all parcel room cameras) (maybe have to adjust this later)
+		std::pair<short, EventLoadout::LoadoutData> plant176loadout;
+		plant176loadout.first = 176;
+		plant176loadout.second.CamStatusAddressOffsetToStatusMap = {
+			{610, true},
+			{611, true},
+			{612, true}
+		};
+
+		// (Also fix the parcel room cameras for the Emma countdown)
+
 		EventLoadout::stage_to_progress_to_loadout_u_map stageToProgressToLoadoutMap = {
 			{
 				Tanker,
@@ -65,14 +140,26 @@ namespace MGS2::Challenge {
 					tanker14loadout,
 					tanker29loadout
 				}
+			},
+			{
+				Plant,
+				{
+					plant9loadout,
+					plant62loadout,
+					plant115loadout,
+					plant120loadout,
+					plant176loadout
+				}
 			}
 		};
 
-		EventLoadout::Run(stageToProgressToLoadoutMap, false);
+		EventLoadout::Run(stageToProgressToLoadoutMap, false, true);
 
 		// Pickup
 
 		// Default pickups
+
+		// ammo
 
 		std::pair<Pickup::DefaultPickupIdentifiers, Pickup::DefaultPickupData> m9Ammo; 
 		m9Ammo.first = { 1, Pickup::PickupCategory::Ammo };
@@ -82,15 +169,79 @@ namespace MGS2::Challenge {
 		uspAmmo.first = { 2, Pickup::PickupCategory::Ammo };
 		uspAmmo.second.Amount = 3;
 
+		std::pair<Pickup::DefaultPickupIdentifiers, Pickup::DefaultPickupData> socomAmmo;
+		socomAmmo.first = { 3, Pickup::PickupCategory::Ammo };
+		socomAmmo.second.Amount = 3;
+
+		// (may have to adjust these values in a later update)
+
+		std::pair<Pickup::DefaultPickupIdentifiers, Pickup::DefaultPickupData> akAmmo;
+		akAmmo.first = { 15, Pickup::PickupCategory::Ammo };
+		akAmmo.second.Amount = 3;
+
+		std::pair<Pickup::DefaultPickupIdentifiers, Pickup::DefaultPickupData> m4Ammo;
+		m4Ammo.first = { 18, Pickup::PickupCategory::Ammo };
+		m4Ammo.second.Amount = 3;
+
+		std::pair<Pickup::DefaultPickupIdentifiers, Pickup::DefaultPickupData> psg1Ammo;
+		psg1Ammo.first = { 4, Pickup::PickupCategory::Ammo };
+		psg1Ammo.second.Amount = 3;
+
+		std::pair<Pickup::DefaultPickupIdentifiers, Pickup::DefaultPickupData> psg1tAmmo;
+		psg1tAmmo.first = { 19, Pickup::PickupCategory::Ammo };
+		psg1tAmmo.second.Amount = 2;
+
+		std::pair<Pickup::DefaultPickupIdentifiers, Pickup::DefaultPickupData> nikitaAmmo;
+		nikitaAmmo.first = { 6, Pickup::PickupCategory::Ammo };
+		nikitaAmmo.second.Amount = 2;
+
+		// weapons
+
+		std::pair<Pickup::DefaultPickupIdentifiers, Pickup::DefaultPickupData> m9;
+		m9.first = { 1, Pickup::PickupCategory::StandaloneWeapon };
+		m9.second.Amount = 1;
+
+		std::pair<Pickup::DefaultPickupIdentifiers, Pickup::DefaultPickupData> ak;
+		ak.first = { 15, Pickup::PickupCategory::StandaloneWeapon };
+		ak.second.Amount = 0;
+
+		std::pair<Pickup::DefaultPickupIdentifiers, Pickup::DefaultPickupData> psg1;
+		psg1.first = { 4, Pickup::PickupCategory::StandaloneWeapon };
+		psg1.second.Amount = 0;
+
+		std::pair<Pickup::DefaultPickupIdentifiers, Pickup::DefaultPickupData> nikita;
+		nikita.first = { 6, Pickup::PickupCategory::StandaloneWeapon };
+		nikita.second.Amount = 0;
+
+		// (may have to adjust these values in a later update)
+
+		std::pair<Pickup::DefaultPickupIdentifiers, Pickup::DefaultPickupData> m4;
+		m4.first = { 18, Pickup::PickupCategory::StandaloneWeapon };
+		m4.second.Amount = 3;
+
+		std::pair<Pickup::DefaultPickupIdentifiers, Pickup::DefaultPickupData> psg1t;
+		psg1t.first = { 19, Pickup::PickupCategory::StandaloneWeapon };
+		psg1t.second.Amount = 2;
+
+		// grenades etc.
+
 		std::pair<Pickup::DefaultPickupIdentifiers, Pickup::DefaultPickupData> chaff;
 		chaff.first = { 10, Pickup::PickupCategory::StandaloneWeapon };
 		chaff.second.Amount = 1;
 
+		std::pair<Pickup::DefaultPickupIdentifiers, Pickup::DefaultPickupData> stun;
+		stun.first = { 11, Pickup::PickupCategory::StandaloneWeapon };
+		stun.second.Amount = 1;
+
 		Pickup::default_pickup_ids_to_data_map defaultPickupIdentifiersToDataMap = {
-			m9Ammo, uspAmmo, chaff
+			m9Ammo, uspAmmo, socomAmmo, akAmmo, m4Ammo, psg1Ammo, psg1tAmmo, nikitaAmmo,
+			m9, ak, psg1, nikita, m4, psg1t,
+			chaff, stun
 		};
 
 		// Pickup instances
+
+		// Tanker
 
 		std::pair<Pickup::PickupInstanceIdentifiers, Pickup::PickupInstanceData> tankerStartChaff;
 		tankerStartChaff.first = {"w00a",10000,2224,-500 };
@@ -257,42 +408,273 @@ namespace MGS2::Challenge {
 		hold1entranceM9ammo.first = {"w04a",7000,-4783,1750};
 		hold1entranceM9ammo.second.DefaultPickupDataReplacement.SpawnType = Pickup::NeverSpawn;
 
+		// Plant
+
+		std::pair<Pickup::PickupInstanceIdentifiers, Pickup::PickupInstanceData> deepSeaDockEZM9ammo1;
+		deepSeaDockEZM9ammo1.first = { "w11a",-8625,-43783,14375 };
+		deepSeaDockEZM9ammo1.second.DefaultPickupDataReplacement.SpawnType = Pickup::NeverSpawn;
+
+		std::pair<Pickup::PickupInstanceIdentifiers, Pickup::PickupInstanceData> deepSeaDockEZM9ammo2;
+		deepSeaDockEZM9ammo2.first = { "w11a",-7750,-43783,15125 };
+		deepSeaDockEZM9ammo2.second.DefaultPickupDataReplacement.SpawnType = Pickup::NeverSpawn;
+
+		std::pair<Pickup::PickupInstanceIdentifiers, Pickup::PickupInstanceData> deepSeaDockVEM9;
+		deepSeaDockVEM9.first = { "w11a",-18000,-45774,20250 };
+		deepSeaDockVEM9.second.DefaultPickupDataReplacement.SpawnType = Pickup::NeverSpawn;
+
+		std::pair<Pickup::PickupInstanceIdentifiers, Pickup::PickupInstanceData> strutARoofEZM9;
+		strutARoofEZM9.first = { "w12a",-4800,5226,-12175 };
+		strutARoofEZM9.second.DefaultPickupDataReplacement.SpawnType = Pickup::NeverSpawn;
+
+		std::pair<Pickup::PickupInstanceIdentifiers, Pickup::PickupInstanceData> strutARoofChaff;
+		strutARoofChaff.first = { "w12a",6000,5224,-13000 };
+		strutARoofChaff.second.DefaultPickupDataReplacement.MinProgress = 106;
+		strutARoofChaff.second.X = -6480;
+		strutARoofChaff.second.Z = -12185;
+
+		std::pair<Pickup::PickupInstanceIdentifiers, Pickup::PickupInstanceData> strutBSocomAmmoNearNode;
+		strutBSocomAmmoNearNode.first = { "w14a",-48750,-1783,-24500};
+		strutBSocomAmmoNearNode.second.DefaultPickupDataReplacement.MinProgress = 63;
+		strutBSocomAmmoNearNode.second.X = -43975;
+		strutBSocomAmmoNearNode.second.Z = -29910;
+
+		std::pair<Pickup::PickupInstanceIdentifiers, Pickup::PickupInstanceData> strutBSocomAmmoInLocker;
+		strutBSocomAmmoInLocker.first = {"w14a",-50500,417,-43125};
+		strutBSocomAmmoInLocker.second.DefaultPickupDataReplacement.MinProgress = 63;
+		strutBSocomAmmoInLocker.second.X = -55515;
+		strutBSocomAmmoInLocker.second.Y = 118;
+		strutBSocomAmmoInLocker.second.Z = -33449;
+
+		std::pair<Pickup::PickupInstanceIdentifiers, Pickup::PickupInstanceData> strutBM9Ammo;
+		strutBM9Ammo.first = { "w14a",-46625,218,-34875 };
+		strutBM9Ammo.second.DefaultPickupDataReplacement.MinProgress = 63;
+
+		std::pair<Pickup::PickupInstanceIdentifiers, Pickup::PickupInstanceData> bcBridgeChaff;
+		bcBridgeChaff.first = {"w15a",-47750,224,-60000};
+		bcBridgeChaff.second.DefaultPickupDataReplacement.MinProgress = 106;
+
+		std::pair<Pickup::PickupInstanceIdentifiers, Pickup::PickupInstanceData> diningHallSocomAmmo;
+		diningHallSocomAmmo.first = {"w16a",-60500,217,-85875};
+		diningHallSocomAmmo.second.DefaultPickupDataReplacement.MinProgress = 98;
+		diningHallSocomAmmo.second.X = -52015;
+		diningHallSocomAmmo.second.Z = -78025;
+
+		std::pair<Pickup::PickupInstanceIdentifiers, Pickup::PickupInstanceData> diningHallM9Ammo;
+		diningHallM9Ammo.first = {"w16a",-43750,217,-85875};
+		diningHallM9Ammo.second.DefaultPickupDataReplacement.MinProgress = 106;
+		diningHallM9Ammo.second.X = -57400;
+		diningHallM9Ammo.second.Z = -82300;
+
+		std::pair<Pickup::PickupInstanceIdentifiers, Pickup::PickupInstanceData> pumpRoomEastStairsM9ammo;
+		pumpRoomEastStairsM9ammo.first = {"w12b",6250,5217,-7875};
+		pumpRoomEastStairsM9ammo.second.DefaultPickupDataReplacement.MinProgress = 117;
+
+		std::pair<Pickup::PickupInstanceIdentifiers, Pickup::PickupInstanceData> pumpRoomEastLockerSocomAmmo;
+		pumpRoomEastLockerSocomAmmo.first = {"w12b",-9500,417,-4250};
+		pumpRoomEastLockerSocomAmmo.second.DefaultPickupDataReplacement.MinProgress = 106;
+		pumpRoomEastLockerSocomAmmo.second.X = -10525;
+		pumpRoomEastLockerSocomAmmo.second.Y = 118;
+		pumpRoomEastLockerSocomAmmo.second.Z = -2515;
+
+		std::pair<Pickup::PickupInstanceIdentifiers, Pickup::PickupInstanceData> pumpRoomSouthRoomSocomAmmo;
+		pumpRoomSouthRoomSocomAmmo.first = {"w12b",-8500,217,1000};
+		pumpRoomSouthRoomSocomAmmo.second.DefaultPickupDataReplacement.MinProgress = 102;
+		pumpRoomSouthRoomSocomAmmo.second.X = -9525;
+		pumpRoomSouthRoomSocomAmmo.second.Z = 1725;
+
+		std::pair<Pickup::PickupInstanceIdentifiers, Pickup::PickupInstanceData> pumpRoomUnderDeskM9Ammo;
+		pumpRoomUnderDeskM9Ammo.first = {"w12b",0,217,-6250};
+		pumpRoomUnderDeskM9Ammo.second.DefaultPickupDataReplacement.MinProgress = 117;
+		pumpRoomUnderDeskM9Ammo.second.Z = -2940;
+
+		std::pair<Pickup::PickupInstanceIdentifiers, Pickup::PickupInstanceData> faBridgeChaff;
+		faBridgeChaff.first = { "w23a",-13000,-4276,2000 };
+		faBridgeChaff.second.X = 7;
+		faBridgeChaff.second.Z = 2626;
+
+		std::pair<Pickup::PickupInstanceIdentifiers, Pickup::PickupInstanceData> warehouseM9roomNorthM9ammo;
+		warehouseM9roomNorthM9ammo.first = { "w22a",56500,217,-23750 };
+		warehouseM9roomNorthM9ammo.second.DefaultPickupDataReplacement.MinProgress = 117;
+
+		std::pair<Pickup::PickupInstanceIdentifiers, Pickup::PickupInstanceData> warehouseM9roomEastM9ammo;
+		warehouseM9roomEastM9ammo.first = { "w22a",57500,217,-22250 };
+		warehouseM9roomEastM9ammo.second.DefaultPickupDataReplacement.MinProgress = 155;
+
+		std::pair<Pickup::PickupInstanceIdentifiers, Pickup::PickupInstanceData> warehouseSocomAmmoOutM9RoomVent;
+		warehouseSocomAmmoOutM9RoomVent.first = { "w22a",63000,217,-25000 };
+		warehouseSocomAmmoOutM9RoomVent.second.Y = 20;
+		warehouseSocomAmmoOutM9RoomVent.second.Z = -24080;
+
+		std::pair<Pickup::PickupInstanceIdentifiers, Pickup::PickupInstanceData> warehouseStun;
+		warehouseStun.first = { "w22a",52500,-4776,-33250 };
+		warehouseStun.second.Y = -2970;
+		warehouseStun.second.Z = -31985;
+
+		std::pair<Pickup::PickupInstanceIdentifiers, Pickup::PickupInstanceData> warehouseChaff;
+		warehouseChaff.first = { "w22a",51000,-4776,-18625 };
+		warehouseChaff.second.X = 46470;
+		warehouseChaff.second.Z = -29490;
+
+		std::pair<Pickup::PickupInstanceIdentifiers, Pickup::PickupInstanceData> warehouseBtmFloorEastBoxesSocomAmmo;
+		warehouseBtmFloorEastBoxesSocomAmmo.first = { "w22a",58625,-3783,-28500 };
+		warehouseBtmFloorEastBoxesSocomAmmo.second.X = 57520;
+		warehouseBtmFloorEastBoxesSocomAmmo.second.Y = -2783;
+		warehouseBtmFloorEastBoxesSocomAmmo.second.Z = -28540;
+
+		std::pair<Pickup::PickupInstanceIdentifiers, Pickup::PickupInstanceData> warehouseBtmFloorEastBoxesM9Ammo;
+		warehouseBtmFloorEastBoxesM9Ammo.first = { "w22a",59000,-2783,-26000 };
+		warehouseBtmFloorEastBoxesM9Ammo.second.X = 47530;
+		warehouseBtmFloorEastBoxesM9Ammo.second.Y = -2783;
+		warehouseBtmFloorEastBoxesM9Ammo.second.Z = -24975;
+
+		std::pair<Pickup::PickupInstanceIdentifiers, Pickup::PickupInstanceData> warehouseBtmFloorSoutheastRoomM9Ammo;
+		warehouseBtmFloorSoutheastRoomM9Ammo.first = { "w22a",57500,-4783,-23250 };
+		warehouseBtmFloorSoutheastRoomM9Ammo.second.X = 56953;
+
+		std::pair<Pickup::PickupInstanceIdentifiers, Pickup::PickupInstanceData> warehouseSocomSuppressor;
+		warehouseSocomSuppressor.first = { "w22a",57625,-4774,-20375 };
+		warehouseSocomSuppressor.second.X = 55526;
+		warehouseSocomSuppressor.second.Z = -21708;
+
+		std::pair<Pickup::PickupInstanceIdentifiers, Pickup::PickupInstanceData> warehouseMineDetector;
+		warehouseMineDetector.first = { "w22a",55375,-4547,-23625 };
+		warehouseMineDetector.second.X = 57625;
+		warehouseMineDetector.second.Z = -20375;
+
+		std::pair<Pickup::PickupInstanceIdentifiers, Pickup::PickupInstanceData> heliportBox3;
+		heliportBox3.first = {"w20b",51500,11853,-84400};
+		heliportBox3.second.X = 44230;
+		heliportBox3.second.Z = -94360;
+
+		std::pair<Pickup::PickupInstanceIdentifiers, Pickup::PickupInstanceData> heliportStun;
+		heliportStun.first = { "w20b",47000,11724,-96250 };
+		heliportStun.second.X = 64440;
+		heliportStun.second.Z = -90675;
+		heliportStun.second.DefaultPickupDataReplacement.MaxProgress = 106;
+
+		std::pair<Pickup::PickupInstanceIdentifiers, Pickup::PickupInstanceData> parcelRoomStun;
+		parcelRoomStun.first = {"w20a",51500,224,-92000};
+		parcelRoomStun.second.DefaultPickupDataReplacement.MinProgress = 98;
+
+		std::pair<Pickup::PickupInstanceIdentifiers, Pickup::PickupInstanceData> parcelRoomNorthEastSocomAmmo;
+		parcelRoomNorthEastSocomAmmo.first = { "w20a",56000,217,-100000 };
+		parcelRoomNorthEastSocomAmmo.second.DefaultPickupDataReplacement.MinProgress = 98;
+		parcelRoomNorthEastSocomAmmo.second.X = 54010;
+		parcelRoomNorthEastSocomAmmo.second.Z = -80530;
+
+		std::pair<Pickup::PickupInstanceIdentifiers, Pickup::PickupInstanceData> parcelRoomNorthWestSocomAmmo;
+		parcelRoomNorthWestSocomAmmo.first = { "w20a",48000,217,-100000 };
+		parcelRoomNorthWestSocomAmmo.second.DefaultPickupDataReplacement.MinProgress = 98;
+		parcelRoomNorthWestSocomAmmo.second.X = 49995;
+		parcelRoomNorthWestSocomAmmo.second.Z = -80530;
+
+		std::pair<Pickup::PickupInstanceIdentifiers, Pickup::PickupInstanceData> parcelRoomM9Ammo;
+		parcelRoomM9Ammo.first = {"w20a",52000,217,-87500};
+		parcelRoomM9Ammo.second.DefaultPickupDataReplacement.MinProgress = 98;
+
+		std::pair<Pickup::PickupInstanceIdentifiers, Pickup::PickupInstanceData> parcelRoomM4Ammo;
+		parcelRoomM4Ammo.first = { "w20a",53500,217,-84750 };
+		parcelRoomM4Ammo.second.X = 52650;
+		parcelRoomM4Ammo.second.Z = -93950;
+
+		std::pair<Pickup::PickupInstanceIdentifiers, Pickup::PickupInstanceData> sedimentPoolM9Ammo;
+		sedimentPoolM9Ammo.first = {"w18a",-6500,-3783,-133500};
+		sedimentPoolM9Ammo.second.DefaultPickupDataReplacement.MinProgress = 102;
+
+		std::pair<Pickup::PickupInstanceIdentifiers, Pickup::PickupInstanceData> sedimentPoolSocomAmmo;
+		sedimentPoolSocomAmmo.first = {"w18a",-8500,-783,-109500};
+		sedimentPoolSocomAmmo.second.X = 1250;
+		sedimentPoolSocomAmmo.second.Z = -119250;
+
+		std::pair<Pickup::PickupInstanceIdentifiers, Pickup::PickupInstanceData> sedimentPoolRation;
+		sedimentPoolRation.first = { "w18a",1250,-778,-119250};
+		sedimentPoolRation.second.X = -8500;
+		sedimentPoolRation.second.Z = -109500;
+
+		std::pair<Pickup::PickupInstanceIdentifiers, Pickup::PickupInstanceData> deBridgeSocomAmmo;
+		deBridgeSocomAmmo.first = { "w19a",12750,-4283,3500};
+		deBridgeSocomAmmo.second.Z = 2000;
+		deBridgeSocomAmmo.second.DefaultPickupDataReplacement.MinProgress = 106;
+
+		std::pair<Pickup::PickupInstanceIdentifiers, Pickup::PickupInstanceData> deBridgeStun;
+		deBridgeStun.first = { "w19a",13250,-4276,2750};
+		deBridgeStun.second.X = -10;
+		deBridgeStun.second.Z = 1400;
+		deBridgeStun.second.DefaultPickupDataReplacement.MinProgress = 106;
+
+		std::pair<Pickup::PickupInstanceIdentifiers, Pickup::PickupInstanceData> deepSeaDockSocomAmmo1;
+		deepSeaDockSocomAmmo1.first = {"w11a",500,-44783,-500};
+		deepSeaDockSocomAmmo1.second.DefaultPickupDataReplacement.SpawnType = Pickup::NeverSpawn;
+
+		std::pair<Pickup::PickupInstanceIdentifiers, Pickup::PickupInstanceData> deepSeaDockSocomAmmo2;
+		deepSeaDockSocomAmmo2.first = { "w11a",5500,-44780,-1000};
+		deepSeaDockSocomAmmo2.second.DefaultPickupDataReplacement.SpawnType = Pickup::NeverSpawn;
+
+		std::pair<Pickup::PickupInstanceIdentifiers, Pickup::PickupInstanceData> deepSeaDockSocomAmmo3;
+		deepSeaDockSocomAmmo3.first = { "w11a",5500,-44779,-1000};
+		deepSeaDockSocomAmmo3.second.DefaultPickupDataReplacement.SpawnType = Pickup::NeverSpawn;
+
+		std::pair<Pickup::PickupInstanceIdentifiers, Pickup::PickupInstanceData> strutAroofM9ammo;
+		strutAroofM9ammo.first = {"w12a",-8000,5217,-2500};
+		strutAroofM9ammo.second.X = 8525;
+		strutAroofM9ammo.second.Z = -3225;
+		strutAroofM9ammo.second.DefaultPickupDataReplacement.MinProgress = 117;
+
+		std::pair<Pickup::PickupInstanceIdentifiers, Pickup::PickupInstanceData> heliportPreFatmanSocomAmmo;
+		heliportPreFatmanSocomAmmo.first = { "w20b",59000,11717,-80500 };
+		heliportPreFatmanSocomAmmo.second.DefaultPickupDataReplacement.SpawnType = Pickup::NeverSpawn;
+
+		std::pair<Pickup::PickupInstanceIdentifiers, Pickup::PickupInstanceData> fatmanM9ammo;
+		fatmanM9ammo.first = {"w20b",66250,11717,-103500};
+		fatmanM9ammo.second.X = 47025;
+		fatmanM9ammo.second.Y = 11517;
+		fatmanM9ammo.second.Z = -92845;
+		fatmanM9ammo.second.DefaultPickupDataReplacement.Amount = 15;
+
+		std::pair<Pickup::PickupInstanceIdentifiers, Pickup::PickupInstanceData> fatmanSocomAmmo1;
+		fatmanSocomAmmo1.first = {"w20b",49375,11717,-101750};
+		fatmanSocomAmmo1.second.DefaultPickupDataReplacement.Amount = 12;
+
+		std::pair<Pickup::PickupInstanceIdentifiers, Pickup::PickupInstanceData> fatmanSocomAmmo2;
+		fatmanSocomAmmo2.first = {"w20b",63625,11717,-90750};
+		fatmanSocomAmmo2.second.DefaultPickupDataReplacement.Amount = 12;
+
+		std::pair<Pickup::PickupInstanceIdentifiers, Pickup::PickupInstanceData> fatmanSocomAmmo3;
+		fatmanSocomAmmo3.first = {"w20b",46000,11717,-81875};
+		fatmanSocomAmmo3.second.DefaultPickupDataReplacement.Amount = 12;
+
 		Pickup::pickup_instance_ids_to_data_map pickupInstanceIdentifiersToDataMap = {
+			// Tanker
 			tankerStartChaff,
 			deckAM9Ammo,
-			crewLoungeM9ammo,
-			crewLoungeUSPammo,
+			crewLoungeM9ammo,crewLoungeUSPammo,
 			deckBM9ammo,
 			deckCChaff,
-			deckDM9ammoPantry,
-			deckDbox1,
-			deckDUSPammoCamera,
-			deckDUSPammoTable,
-			deckDM9ammoTable,
-			deckEUSPammo,
-			olgaM9AmmoBetweenBoxes,
-			olgaM9AmmoSouth,
-			olgaRationVE,
-			navDeckRationNearOlga,
-			navDeckUSPSuppressor,
-			navDeckWetBox,
-			vulcanRavenRoomUSPammo,
-			engineRoomM9ammo,
-			engineRoomBtmFloorUSPammo,
-			engineRoomMidFloorUSPammo,
-			engineRoomLasersWestUSPammo,
-			engineRoomLasersEastUSPammo,
-			deck2MarineUSPammo,
-			deck2junctionUSPammo,
-			deck2horizontalHallUSPammo,
-			deck2nearStarboardUSPammo,
-			deck2starboardM9ammo,
-			deck2starboardPipesUSPammo,
+			deckDM9ammoPantry,deckDbox1,deckDUSPammoCamera,deckDUSPammoTable,deckDM9ammoTable,deckEUSPammo,
+			olgaM9AmmoBetweenBoxes,olgaM9AmmoSouth,olgaRationVE,
+			navDeckRationNearOlga,navDeckUSPSuppressor,navDeckWetBox,
+			vulcanRavenRoomUSPammo,engineRoomM9ammo,engineRoomBtmFloorUSPammo,engineRoomMidFloorUSPammo,engineRoomLasersWestUSPammo,engineRoomLasersEastUSPammo,
+			deck2MarineUSPammo,deck2junctionUSPammo,deck2horizontalHallUSPammo,deck2nearStarboardUSPammo,deck2starboardM9ammo,deck2starboardPipesUSPammo,
 			deck2starboardNorthUSPammo,
-			guardRushNorthUSPammo,
-			guardRushSouthUSPammo,
-			guardRushRation,
-			hold1entranceM9ammo
+			guardRushNorthUSPammo,guardRushSouthUSPammo,guardRushRation,
+			hold1entranceM9ammo,
+			// Plant
+			deepSeaDockEZM9ammo1,deepSeaDockEZM9ammo2,deepSeaDockVEM9,
+			strutARoofEZM9,strutARoofChaff,strutAroofM9ammo,
+			strutBSocomAmmoNearNode,strutBSocomAmmoInLocker,strutBM9Ammo,
+			bcBridgeChaff,
+			diningHallSocomAmmo,diningHallM9Ammo,
+			pumpRoomEastStairsM9ammo,pumpRoomEastLockerSocomAmmo,pumpRoomSouthRoomSocomAmmo,pumpRoomUnderDeskM9Ammo,
+			faBridgeChaff,
+			warehouseM9roomEastM9ammo,warehouseM9roomNorthM9ammo,warehouseSocomAmmoOutM9RoomVent,warehouseStun,warehouseChaff,warehouseBtmFloorEastBoxesSocomAmmo,
+			warehouseBtmFloorEastBoxesM9Ammo,warehouseBtmFloorSoutheastRoomM9Ammo,warehouseSocomSuppressor,warehouseMineDetector,
+			heliportBox3,heliportStun,
+			parcelRoomStun,parcelRoomNorthEastSocomAmmo,parcelRoomNorthWestSocomAmmo,parcelRoomM9Ammo,parcelRoomM4Ammo,
+			sedimentPoolM9Ammo,sedimentPoolSocomAmmo,sedimentPoolRation,
+			deBridgeSocomAmmo,deBridgeStun,
+			deepSeaDockSocomAmmo1,deepSeaDockSocomAmmo2,deepSeaDockSocomAmmo3,
+			heliportPreFatmanSocomAmmo,
+			fatmanM9ammo,fatmanSocomAmmo1,fatmanSocomAmmo2,fatmanSocomAmmo3
 		};
 
 		Pickup::Run(defaultPickupIdentifiersToDataMap, pickupInstanceIdentifiersToDataMap);
