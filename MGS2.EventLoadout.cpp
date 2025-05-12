@@ -47,7 +47,8 @@ namespace MGS2::EventLoadout {
 		{"deckccam", 0},
 		{"parcelroomnwcam", 610},
 		{"parcelroomswcam", 611},
-		{"parcelroomsecam", 612}
+		{"parcelroomsecam", 612},
+		{"shell1coresouthcam", 950}
 	};
 
 	static const std::unordered_map<Stage, std::unordered_map<short, LocationIdentifier>> StageToProgressToSpecialEventLocationMap{
@@ -267,8 +268,18 @@ namespace MGS2::EventLoadout {
 
 				static std::uint8_t* camStatusAddressStart = (std::uint8_t*)0x118DBD7; // (Deck-C cam status)
 				std::uint8_t* camStatusAddress = (camStatusAddressStart + camStatusAddressOffsetToStatus.first);
-				// (At least for the Deck-C camera, the second status address is 56 bytes away. For the rest, it is 3 bytes)
-				std::uint8_t* camStatus2Address = (camStatusAddressOffsetToStatus.first == 0) ? camStatusAddress + 56 : camStatusAddress + 3;
+				std::uint8_t* camStatus2Address;
+				switch (camStatusAddressOffsetToStatus.first) {
+					case 0:
+						camStatus2Address = camStatusAddress + 56;
+						break;
+					case 950:
+						camStatus2Address = camStatusAddress + 5;
+						break;
+					default:
+						camStatus2Address = camStatusAddress + 3;
+				}
+
 				// If true, make the camera not broken
 				if (camStatusAddressOffsetToStatus.second) {
 					*camStatusAddress = 0;
@@ -325,6 +336,12 @@ namespace MGS2::EventLoadout {
 		if (ini.IsEmpty() || (!ini.GetBoolValue(Category, "Enabled", false))) {
 			return;
 		}
+
+		mem::PatchSet patchSet = mem::PatchSet{
+			// Set the chaff timer to 5s
+			mem::Patch((void*)0x957349, "\x2C\x01")
+		};
+		patchSet.Patch();
 
 		bool needToHookForMainGCL = false;
 
