@@ -43,12 +43,52 @@ namespace MGS2::EventLoadout {
 		{"engineroomflags", (std::uint8_t*)0x118E4E4},
 	};
 
-	static const std::unordered_map<std::string, short> NameToCamStatusAddressOffsetMap{
-		{"deckccam", 0},
-		{"parcelroomnwcam", 610},
-		{"parcelroomswcam", 611},
-		{"parcelroomsecam", 612},
-		{"shell1coresouthcam", 950}
+	static const std::unordered_map<std::string, ToggleableActor> NameToToggleableActorMap{
+		{"deckccam", DeckCCam},
+		{"deckanwlocker", DeckANWLocker},
+		{"parcelroomnwcam", ParcelRoomNWcam},
+		{"parcelroomswcam", ParcelRoomSWcam},
+		{"parcelroomsecam", ParcelRoomSEcam},
+		{"shell1core1fsouth1stlockerfromwest", Shell1Core1FSouth1stLockerFromWest},
+		{"shell1core1fsouth2ndlockerfromwest", Shell1Core1FSouth2ndLockerFromWest},
+		{"shell1core1fsouth3rdlockerfromwest", Shell1Core1FSouth3rdLockerFromWest},
+		{"shell1core1fsouth3rdlockerfromeast", Shell1Core1FSouth3rdLockerFromEast},
+		{"shell1core1fsouth2ndlockerfromeast", Shell1Core1FSouth2ndLockerFromEast},
+		{"shell1core1fsouth1stlockerfromeast", Shell1Core1FSouth1stLockerFromEast},
+		{"shell1core1fsouthcam", Shell1Core1FSouthCam},
+		{"arsenalgearstomachlocker", ArsenalGearStomachLocker}
+	};
+
+	struct ToggleableActorData {
+		short Status1AddressOffset;
+		std::int8_t Status2AddressOffset;
+		bool InverseToggle; // If true, true/yes/on means setting value to 0
+		ToggleableActorData(short status1AddressOffset, std::int8_t status2AddressOffset, bool inverseToggle = false) :
+			Status1AddressOffset(status1AddressOffset), Status2AddressOffset(status2AddressOffset), InverseToggle(inverseToggle) {}
+	};
+
+	static const std::unordered_map<ToggleableActor, ToggleableActorData> ToggleableActorToDataMap{
+		{DeckCCam, {0, 56, true}},
+		{DeckANWLocker,{1+32,-32}},
+		{ParcelRoomNWcam, {610, 3, true}},
+		{ParcelRoomSWcam, {611, 3, true}},
+		{ParcelRoomSEcam, {612, 3, true}},
+		{Shell1Core1FSouth1stLockerFromWest,{913+27, -27}},
+		{Shell1Core1FSouth2ndLockerFromWest,{917+24, -24}},
+		{Shell1Core1FSouth3rdLockerFromWest,{921+21, -21}},
+		{Shell1Core1FSouth3rdLockerFromEast,{925+18, -18}},
+		{Shell1Core1FSouth2ndLockerFromEast,{929+15, -15}},
+		{Shell1Core1FSouth1stLockerFromEast,{933+12, -12}},
+		{Shell1Core1FSouthCam, {950, 5, true}},
+		{ArsenalGearStomachLocker,{1341-4, 4}}
+	};
+
+	struct LocationIdentifier {
+		const char* AreaCode;
+		int X;
+		int Y;
+		int Z;
+		LocationIdentifier(const char* areaCode, int x, int y, int z) : AreaCode(areaCode), X(x), Y(y), Z(z) {}
 	};
 
 	static const std::unordered_map<Stage, std::unordered_map<short, LocationIdentifier>> StageToProgressToSpecialEventLocationMap{
@@ -261,35 +301,19 @@ namespace MGS2::EventLoadout {
 				*flagAddressToORMask.first |= flagAddressToORMask.second;
 			}
 
-			// Repair/remove the desired cameras
-			for (const auto& camStatusAddressOffsetToStatus : loadoutDataIt->second.CamStatusAddressOffsetToStatusMap) {
+			for (const auto& toggleableActorToStatus : loadoutDataIt->second.ToggleableActorToStatusMap) {
 
-				// Calculate the camera statuses' addresses
+				// Calculate the actor statuses' addresses
 
-				static std::uint8_t* camStatusAddressStart = (std::uint8_t*)0x118DBD7; // (Deck-C cam status)
-				std::uint8_t* camStatusAddress = (camStatusAddressStart + camStatusAddressOffsetToStatus.first);
-				std::uint8_t* camStatus2Address;
-				switch (camStatusAddressOffsetToStatus.first) {
-					case 0:
-						camStatus2Address = camStatusAddress + 56;
-						break;
-					case 950:
-						camStatus2Address = camStatusAddress + 5;
-						break;
-					default:
-						camStatus2Address = camStatusAddress + 3;
-				}
+				static std::uint8_t* toggleableActorStatusAddressStart = (std::uint8_t*)0x118DBD7; // (Deck-C cam status)
+				ToggleableActorData toggleableActorData = ToggleableActorToDataMap.at(toggleableActorToStatus.first);
+				std::uint8_t* toggleableActorStatus1Address = (toggleableActorStatusAddressStart + toggleableActorData.Status1AddressOffset);
+				std::uint8_t* toggleableActorStatus2Address = toggleableActorStatus1Address + toggleableActorData.Status2AddressOffset;
 
-				// If true, make the camera not broken
-				if (camStatusAddressOffsetToStatus.second) {
-					*camStatusAddress = 0;
-					*camStatus2Address = 0;
-				}
-				// Else, basically make the camera blown up
-				else {
-					*camStatusAddress = 144; // This can be other values as well but 144 seems to work
-					*camStatus2Address = 2; // 1 - regular broken camera, 2 - blown up camera
-				}
+				*toggleableActorStatus1Address = 144; // can be other values too but this seems to work, basically needed for the change below to apply
+
+				bool setActive = toggleableActorData.InverseToggle ? !toggleableActorToStatus.second : toggleableActorToStatus.second;
+				*toggleableActorStatus2Address = setActive ? 2 : 0; // 0 - closed locker / functioning camera, 2 - open locker / blown up camera
 			}
 
 		catch_mgs2(Category, "884CA0")
@@ -442,11 +466,12 @@ namespace MGS2::EventLoadout {
 					continue;
 				}
 
-				// Sets the data for cameras to enable/disable
+				// Sets the data for toggleable actors
 
-				auto NameToCamAddressOffsetIt = NameToCamStatusAddressOffsetMap.find(sectionKeyStr);
-				if (NameToCamAddressOffsetIt != NameToCamStatusAddressOffsetMap.end()) {
-					loadoutData.CamStatusAddressOffsetToStatusMap[NameToCamAddressOffsetIt->second] = ini.GetBoolFromChar(value.c_str());
+				auto nameToToggleableActorIt = NameToToggleableActorMap.find(sectionKeyStr);
+				if (nameToToggleableActorIt != NameToToggleableActorMap.end()) {
+					loadoutData.ToggleableActorToStatusMap[nameToToggleableActorIt->second] = ini.GetBoolFromChar(value.c_str());
+					continue;
 				}
 
 				// Start setting data for an inventory item

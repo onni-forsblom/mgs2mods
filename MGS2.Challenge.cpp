@@ -106,28 +106,28 @@ namespace MGS2::Challenge {
 		// Fortune fight end (fix all parcel room cameras)
 		std::pair<short, EventLoadout::LoadoutData> plant115loadout;
 		plant115loadout.first = 115;
-		plant115loadout.second.CamStatusAddressOffsetToStatusMap = {
-			{610, true},
-			{611, true},
-			{612, true}
+		plant115loadout.second.ToggleableActorToStatusMap = {
+			{EventLoadout::ParcelRoomNWcam, true},
+			{EventLoadout::ParcelRoomSWcam, true},
+			{EventLoadout::ParcelRoomSEcam, true}
 		};
 
 		// Final bomb countdown (fix all parcel room cameras)
 		std::pair<short, EventLoadout::LoadoutData> plant120loadout;
 		plant120loadout.first = 120;
-		plant120loadout.second.CamStatusAddressOffsetToStatusMap = {
-			{610, true},
-			{611, true},
-			{612, true}
+		plant120loadout.second.ToggleableActorToStatusMap = {
+			{EventLoadout::ParcelRoomNWcam, true},
+			{EventLoadout::ParcelRoomSWcam, true},
+			{EventLoadout::ParcelRoomSEcam, true}
 		};
 
 		// Outside hostage room after Ames (fix all parcel room cameras) (maybe have to adjust this later)
 		std::pair<short, EventLoadout::LoadoutData> plant176loadout;
 		plant176loadout.first = 176;
-		plant176loadout.second.CamStatusAddressOffsetToStatusMap = {
-			{610, true},
-			{611, true},
-			{612, true}
+		plant176loadout.second.ToggleableActorToStatusMap = {
+			{EventLoadout::ParcelRoomNWcam, true},
+			{EventLoadout::ParcelRoomSWcam, true},
+			{EventLoadout::ParcelRoomSEcam, true}
 		};
 
 		// (Also fix the parcel room cameras for the Emma countdown)
