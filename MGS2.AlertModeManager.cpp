@@ -28,9 +28,11 @@ namespace MGS2::AlertModeManager {
 		StoredAlertMode = newAlertMode;
 
 		// If we want to set caution mode,
-		// set the caution time that is stored between area loads too
+		// set the caution time that is stored between area loads too to initial caution time
 		if (newAlertMode == AlertMode::Caution) {
-			StoredCautionTime = InitialCautionTime;
+			// (On loading a game, initial caution time may not yet be set.
+			// In that case, just set stored caution time to 3600)
+			StoredCautionTime = (InitialCautionTime > 0) ? InitialCautionTime : 3600;
 		}
 	}
 
