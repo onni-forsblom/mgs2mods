@@ -176,7 +176,7 @@ namespace MGS2::EventLoadout {
 		float& charY = *(float*)0xA18A04;
 		float& charZ = *(float*)0xA18A08;
 
-		const int marginOfError = 50;
+		const int marginOfError = 5;
 
 		// If the player character was not near the specific required location, do not employ the loadout
 		if ((strcmp(specialEventLocationIt->second.AreaCode, Mem::AreaCode) != 0)
