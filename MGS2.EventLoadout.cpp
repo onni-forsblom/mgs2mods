@@ -361,12 +361,6 @@ namespace MGS2::EventLoadout {
 			return;
 		}
 
-		mem::PatchSet patchSet = mem::PatchSet{
-			// Set the chaff timer to 5s
-			mem::Patch((void*)0x957349, "\x2C\x01")
-		};
-		patchSet.Patch();
-
 		bool needToHookForMainGCL = false;
 
 		// Warning on starting a new game if loadout data was parsed
