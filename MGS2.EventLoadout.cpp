@@ -41,6 +41,8 @@ namespace MGS2::EventLoadout {
 		{"itemflags", (std::uint8_t*)0x118AED4},
 		{"tankerflags", (std::uint8_t*)0x118DB21},
 		{"engineroomflags", (std::uint8_t*)0x118E4E4},
+		{"shell2core1fflags", (std::uint8_t*)0x118E077},
+		{"emmaescortflags", (std::uint8_t*)0x118E01A}
 	};
 
 	static const std::unordered_map<std::string, ToggleableActor> NameToToggleableActorMap{

@@ -27,3 +27,18 @@ engineRoomFlags:
   10000: 1st laser control unit destroyed
  100000: 2nd laser control unit destroyed
 1000000: 3rd laser control unit destroyed
+
+shell2core1Fflags:
+      1: second south guard appears (Emma escort)
+     10: east guard has been triggered to move (Emma escort)
+    100: east guard appears, starts stationary but can be triggered to move by approaching (Emma escort)
+   1000: 2nd west guard appears (Emma escort)
+ 100000: turret room spawned nikita ammo has NOT been picked up (before Emma)
+1000000: south spawned nikita ammo has NOT been picked up (before Emma)
+It is unknown what changes 10000 & 10000000 do if any.
+
+emmaEscortFlags:
+  100000: elevator guard appears
+ 1000000: enabled elevator guard appearing on hitting southwest checkpoint (set when Emma reaches certain areas)
+10000000: east guard appears and starts off stationary/sleepy
+It is unknown what changes 1, 10, 100, 1000 & 10000 do if any.
