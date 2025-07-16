@@ -176,7 +176,7 @@ namespace MGS2::Challenge {
 			}
 		};
 
-		EventLoadout::Run(stageToProgressToLoadoutMap, true, true);
+		EventLoadout::Run(stageToProgressToLoadoutMap, true, true, true);
 
 		// Pickup
 

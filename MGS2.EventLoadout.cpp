@@ -15,6 +15,11 @@ namespace MGS2::EventLoadout {
 	static bool ResetAmmoAfterSpecificFights = false;
 	std::vector<ItemData> FightStartItemData;
 
+	// If we want to spawn the version of Shell 2 core with guards after meeting the president
+	static bool SpawnGuardsAfterPrez = false;
+	const char* Shell2Core1FPreEmmaAreaCode = "w31a";
+	const char* Shell2Core1FEmmaAreaCode = "w31d";
+	const int PostPrezCodecEndProgress = 241;
 
 	static const std::unordered_map<std::string, Stage> NameToStageMap{
 		{"tanker", Stage::Tanker},
@@ -329,6 +334,18 @@ namespace MGS2::EventLoadout {
 		int result = oFUN_004e4090(param_1);
 
 		try_mgs2
+
+			// When spawning the version of Shell 2 core with guards right after meeting the prez
+			// make sure game data is loaded correctly
+			if (SpawnGuardsAfterPrez
+				&& Mem::Progress() == PostPrezCodecEndProgress // Check that the progress flag is correct
+				&& (std::strcmp(Mem::AreaCode, Shell2Core1FEmmaAreaCode) == 0)) // Check that we are in Shell 2 core 1F
+			{
+				*(std::uint8_t*)0xF6DE8B = 64; // For getting guard collision etc.
+				*(std::uint8_t*)0xEDE76F = 64; // For getting radar map data
+				
+			}
+
 			// 255 indicates to not change the alert mode
 			if (AlertModeToSet == 255) {
 				return result;
@@ -347,6 +364,27 @@ namespace MGS2::EventLoadout {
 
 	static bool NewGameInfoCallback() {
 		return !StageToProgressToLoadoutMap.empty();
+	}
+	
+	// After writing area code (can change the code here and load another area)
+	tFUN_Void oFUN_0089180C;
+	void __cdecl hkFUN_0089180C() {
+
+		try_mgs2
+
+			// If we want to use the version of shell 2 core with guards after meeting the president...
+			if (SpawnGuardsAfterPrez
+			&& Mem::Progress() >= PostPrezCodecEndProgress // check that we have actually met the prez
+			&& (strcmp(Mem::AreaCode, Shell2Core1FPreEmmaAreaCode) == 0) // check if the game is trying to load the first version of shell 2 core
+				) {
+				// then use the version of shell 2 core with guards
+				strcpy(Mem::AreaCode, Shell2Core1FEmmaAreaCode);
+			}
+			
+		catch_mgs2(Category, "891620");
+		
+		oFUN_0089180C();
+		
 	}
 
 	void Run(CSimpleIniA& ini) {
@@ -526,18 +564,27 @@ namespace MGS2::EventLoadout {
 		}
 	}
 
-	void Run(stage_to_progress_to_loadout_u_map stageToProgressToLoadoutMap, bool needToHookForMainGCL, bool resetAmmoAfterSpecificFights)
+	void Run(stage_to_progress_to_loadout_u_map stageToProgressToLoadoutMap, bool needToHookForMainGCL, bool resetAmmoAfterSpecificFights,
+		bool spawnGuardsAfterPrez)
 	{
 		StageToProgressToLoadoutMap = stageToProgressToLoadoutMap;
 
 		ResetAmmoAfterSpecificFights = resetAmmoAfterSpecificFights;
 
+		SpawnGuardsAfterPrez = spawnGuardsAfterPrez;
+
 		// Hook function that activates on load
 		oFUN_00884ca0 = (tFUN_Void)mem::TrampHook32((BYTE*)0x884CA0, (BYTE*)hkFUN_00884ca0, 6);
 
+		// Hook function that activates after writing area code if we want to spawn guards after meeting the prez
+		if (SpawnGuardsAfterPrez) {
+			oFUN_0089180C = (tFUN_Void)mem::TrampHook32((BYTE*)0x89180C, (BYTE*)hkFUN_0089180C, 5);
+		}
+		
 		// Hook function that activates before/after running main GCL for stage
 		// but only if there is a need
-		if (needToHookForMainGCL) {
+		if (needToHookForMainGCL
+			|| SpawnGuardsAfterPrez) {
 			oFUN_004e4090 = (tFUN_Int_Int)mem::TrampHook32((BYTE*)0x4E4090, (BYTE*)hkFUN_004e4090, 8);
 		}
 	}
