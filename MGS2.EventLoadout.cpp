@@ -343,7 +343,7 @@ namespace MGS2::EventLoadout {
 			{
 				*(std::uint8_t*)0xF6DE8B = 64; // For getting guard collision etc.
 				*(std::uint8_t*)0xEDE76F = 64; // For getting radar map data
-				
+				*(std::uint8_t*)0xDB704B = 64; // For loading map graphics after loading a save
 			}
 
 			// 255 indicates to not change the alert mode
