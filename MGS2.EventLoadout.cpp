@@ -13,6 +13,7 @@ namespace MGS2::EventLoadout {
 
 	// For fights like Fatman where you can gain a lot of ammo (currently just intended for a challenge mod)
 	static bool ResetAmmoAfterSpecificFights = false;
+	// Basically item amounts recorded at the start of the fight and reset to post-battle
 	std::vector<ItemData> FightStartItemData;
 
 	// If we want to spawn the version of Shell 2 core with guards after meeting the president
@@ -190,6 +191,19 @@ namespace MGS2::EventLoadout {
 		return false;
 	}
 
+	/// <param name="weaponNumbers">The number of each weapon which ammo amount we want to reset after a fight</param>
+	static void StoreFightStartAmmoData(const std::vector<int>& weaponNumbers) {
+		// (Make sure there is only the necessary item data)
+		FightStartItemData.clear();
+
+		for (int weaponNumber : weaponNumbers) {
+			ItemData itemData;
+			itemData.Number = weaponNumber;
+			itemData.Amount = ((short*)*Mem::WeaponData)[weaponNumber]; // The current ammo amount for the desired weapon
+			FightStartItemData.push_back(itemData);
+		}
+	}
+
 	// On load
 	tFUN_Void oFUN_00884ca0;
 	void __cdecl hkFUN_00884ca0() {
@@ -217,25 +231,12 @@ namespace MGS2::EventLoadout {
 					// Fatman fight
 					case 118:
 						// Store the ammo amount for the Socom and M9
-						{
-							// (Make sure there is only the necessary item data)
-							FightStartItemData.clear();
-
-							ItemData socomData;
-							socomData.Number = 3;
-							socomData.Amount = ((short*)*Mem::WeaponData)[3]; // Current socom ammo amount
-							// (could make an enum for weapons/equipment but this will do for now)
-
-							ItemData m9Data;
-							m9Data.Number = 1;
-							m9Data.Amount = ((short*)*Mem::WeaponData)[1]; // Current M9 ammo amount
-
-							FightStartItemData = { socomData, m9Data };
-						}
+						// (could make an enum for weapons/equipment but this will do for now)
+						StoreFightStartAmmoData(std::vector<int>{1,3});
 						break;
 					// After Fatman
 					case 120:
-						// Reset ammo for the Socom and M9 to pre-fight (including the amount stored between area loads)
+						// Reset ammo to pre-fight (including the amount stored between area loads)
 						if (!FightStartItemData.empty()) {
 							SetItemsData(FightStartItemData, true, true);
 							// (Make sure there is only the necessary item data)
