@@ -116,17 +116,10 @@ namespace MGS2::EventLoadout {
 
 	static stage_to_progress_to_loadout_u_map StageToProgressToLoadoutMap;
 
-	static void SetItemsData(std::vector<ItemData> itemsData, bool isTankerOrSnakeBossSurvival = true, bool isWeapons = true,
-		bool setStoredItemsToo = false /* item values that are stored between area loads / reset to on continue */) {
-
-		const int otherInventoryOffset = 0x150; // add this to tanker inventory start address to get the inventory start address for Raiden, VR and Snake Tales
-		const int equipmentOffset = 0x90; // add this to the inventory start address to get the equipment start address
-
-		// Do math to get the inventory start address
-
-		char* inventoryStartPtr = (char*)0x118AF1C;
-		inventoryStartPtr += isTankerOrSnakeBossSurvival ? 0 : otherInventoryOffset;
-		inventoryStartPtr += isWeapons ? 0 : equipmentOffset;
+	static void SetItemsData(std::vector<ItemData> itemsData, bool isWeapons = true, bool setStoredItemsToo = false /* item values that are stored between area loads / reset to on continue */) {
+		
+		// Get either the weapon or equipment inventory as desired
+		short* inventoryPtr = isWeapons ? ((short*)*Mem::WeaponData) : ((short*)*Mem::ItemData);
 
 		// The value to add to the item amount address to get the item max capacity address
 		size_t maxOffset = isWeapons ? Mem::WeaponMaxOffset : Mem::ItemMaxOffset;
@@ -137,26 +130,24 @@ namespace MGS2::EventLoadout {
 				continue;
 			}
 
-			// Calculate the quantity address for the item and set the value 
+			// Set the quantity for the item in the inventory
 			// -2 indicates we do not want to change the value
 
-			const int itemAmountByteSize = 2;
-			short* itemAmountPtr = (short*)((inventoryStartPtr + itemData.Number * itemAmountByteSize));
 			if (itemData.Amount != -2) {
-				*itemAmountPtr = itemData.Amount;
+				inventoryPtr[itemData.Number] = itemData.Amount;
 
 				if (setStoredItemsToo) {
 					const int storedItemOffset = 0x1598;
-					short* storedItemAmountPtr = (short*)((char*)itemAmountPtr + storedItemOffset);
-					*storedItemAmountPtr = itemData.Amount;
+					short* storedInventoryPtr = (short*)((char*)inventoryPtr + storedItemOffset);
+					storedInventoryPtr[itemData.Number] = itemData.Amount;
 				}
 			}
 
 			// Calculate the max capacity address for the item and set the value
 			// -1 indicates we do not want to change the value
 			if (itemData.Capacity != -1) {
-				short* itemCapacityPtr = (short*)(((char*)itemAmountPtr + maxOffset));
-				*itemCapacityPtr = itemData.Capacity;
+				short* inventoryCapacityPtr = (short*)((char*)inventoryPtr + maxOffset);
+				inventoryCapacityPtr[itemData.Number] = itemData.Capacity;
 			}
 		}
 	}
@@ -232,11 +223,12 @@ namespace MGS2::EventLoadout {
 
 							ItemData socomData;
 							socomData.Number = 3;
-							socomData.Amount = *(short*)0x118B072; // Current socom ammo amount
+							socomData.Amount = ((short*)*Mem::WeaponData)[3]; // Current socom ammo amount
+							// (could make an enum for weapons/equipment but this will do for now)
 
 							ItemData m9Data;
 							m9Data.Number = 1;
-							m9Data.Amount = *(short*)0x118B06E; // Current M9 ammo amount
+							m9Data.Amount = ((short*)*Mem::WeaponData)[1]; // Current M9 ammo amount
 
 							FightStartItemData = { socomData, m9Data };
 						}
@@ -245,7 +237,7 @@ namespace MGS2::EventLoadout {
 					case 120:
 						// Reset ammo for the Socom and M9 to pre-fight (including the amount stored between area loads)
 						if (!FightStartItemData.empty()) {
-							SetItemsData(FightStartItemData, false, true, true);
+							SetItemsData(FightStartItemData, true, true);
 							// (Make sure there is only the necessary item data)
 							FightStartItemData.clear();
 						}
@@ -279,15 +271,10 @@ namespace MGS2::EventLoadout {
 			char* characterCode = Mem::CharacterCode;
 			const char snakeBossSurvivalCharCode[8] = "r_sna_b";
 
-			// Get this for determining the inventory address
-			bool isTankerOrSnakeBossSurvival =
-				(stage == Stage::Tanker
-					|| characterCode == snakeBossSurvivalCharCode);
-
 			// Finally, set all the data for the items, progress, difficulty and alert mode
 
-			SetItemsData(loadoutDataIt->second.WeaponsData, isTankerOrSnakeBossSurvival, true, setStoredItemsToo);
-			SetItemsData(loadoutDataIt->second.EquipmentData, isTankerOrSnakeBossSurvival, false, setStoredItemsToo);
+			SetItemsData(loadoutDataIt->second.WeaponsData, true, setStoredItemsToo);
+			SetItemsData(loadoutDataIt->second.EquipmentData, false, setStoredItemsToo);
 
 			if (loadoutDataIt->second.WeaponToEquip != -1) {
 				*Mem::EquippedWeapon = loadoutDataIt->second.WeaponToEquip;
