@@ -234,8 +234,15 @@ namespace MGS2::EventLoadout {
 						// (could make an enum for weapons/equipment but this will do for now)
 						StoreFightStartAmmoData(std::vector<int>{1,3});
 						break;
+					// First Vamp fight
+					case 253:
+						// Store the ammo amount for M9, socom, RGB6, AK and M4
+						StoreFightStartAmmoData(std::vector<int>{1, 3, 5, 15, 18});
+						break;
 					// After Fatman
 					case 120:
+					// After Vamp
+					case 257:
 						// Reset ammo to pre-fight (including the amount stored between area loads)
 						if (!FightStartItemData.empty()) {
 							SetItemsData(FightStartItemData, true, true);
