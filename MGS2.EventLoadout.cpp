@@ -218,7 +218,9 @@ namespace MGS2::EventLoadout {
 
 			const Stage stage = Mem::Stage();
 
+			// The main menu etc.
 			if (stage == Stage::None) {
+				FightStartItemData.clear();
 				return;
 			}
 
@@ -234,15 +236,36 @@ namespace MGS2::EventLoadout {
 						// (could make an enum for weapons/equipment but this will do for now)
 						StoreFightStartAmmoData(std::vector<int>{1,3});
 						break;
+					// Harrier fight
+					case 189:
 					// First Vamp fight
 					case 253:
 						// Store the ammo amount for M9, socom, RGB6, AK and M4
 						StoreFightStartAmmoData(std::vector<int>{1, 3, 5, 15, 18});
 						break;
+					// Emma sniping section
+					case 313:
+						// Store the ammo amount for PSG1, and PSG1-T
+						StoreFightStartAmmoData(std::vector<int>{4, 19});
+						break;
+					// Vamp 2
+					case 317:
+						// Set the ammo data
+						// but do not clear the fight start item data (we want to reset to it again after the fight)
+						if (!FightStartItemData.empty()) {
+							SetItemsData(FightStartItemData, true, true);
+						}
+						// Store the ammo amount for PSG1, and PSG1-T (in case the player loaded a save here)
+						StoreFightStartAmmoData(std::vector<int>{4, 19});
+						break;
 					// After Fatman
 					case 120:
+					// After Harrier
+					case 190:
 					// After Vamp
 					case 257:
+					// After Vamp 2
+					case 323:
 						// Reset ammo to pre-fight (including the amount stored between area loads)
 						if (!FightStartItemData.empty()) {
 							SetItemsData(FightStartItemData, true, true);
