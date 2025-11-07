@@ -15,6 +15,8 @@ namespace MGS2::EventLoadout {
 		Shell1Core1FSouth2ndLockerFromEast,
 		Shell1Core1FSouth1stLockerFromEast,
 		Shell1Core1FSouthCam,
+		Shell2Core1FNWTurret,
+		Shell2Core1FSWTurret,
 		ArsenalGearStomachLocker
 	};
 

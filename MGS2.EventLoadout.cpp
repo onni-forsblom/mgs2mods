@@ -64,6 +64,8 @@ namespace MGS2::EventLoadout {
 		{"shell1core1fsouth2ndlockerfromeast", Shell1Core1FSouth2ndLockerFromEast},
 		{"shell1core1fsouth1stlockerfromeast", Shell1Core1FSouth1stLockerFromEast},
 		{"shell1core1fsouthcam", Shell1Core1FSouthCam},
+		{"shell2core1fnwturret", Shell2Core1FNWTurret},
+		{"shell2core1fswturret", Shell2Core1FSWTurret},
 		{"arsenalgearstomachlocker", ArsenalGearStomachLocker}
 	};
 
@@ -88,6 +90,8 @@ namespace MGS2::EventLoadout {
 		{Shell1Core1FSouth2ndLockerFromEast,{929+15, -15}},
 		{Shell1Core1FSouth1stLockerFromEast,{933+12, -12}},
 		{Shell1Core1FSouthCam, {950, 5, true}},
+		{Shell2Core1FNWTurret, {1146, 30, true}},
+		{Shell2Core1FSWTurret, {1147, 30, true}},
 		{ArsenalGearStomachLocker,{1341-4, 4}}
 	};
 
