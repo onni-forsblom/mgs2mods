@@ -79,5 +79,6 @@ namespace MGS2::Pickup {
 	typedef std::map<PickupInstanceIdentifiers, PickupInstanceData> pickup_instance_ids_to_data_map;
 
 	// For running Pickup from other mods
-	void Run(default_pickup_ids_to_data_map defaultPickupIdentifiersToDataMap, pickup_instance_ids_to_data_map pickupInstanceIdentifiersToDataMap);
+	void Run(default_pickup_ids_to_data_map defaultPickupIdentifiersToDataMap, pickup_instance_ids_to_data_map pickupInstanceIdentifiersToDataMap,
+	int npcAmmoDropAmountReplacement = INT_MIN, bool doNotAlterItemsDroppedBySnakeToRaiden = false);
 }

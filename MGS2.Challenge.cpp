@@ -914,7 +914,7 @@ namespace MGS2::Challenge {
 			shell12bridgePSG1ammo,shell12bridgeSocomAmmo
 		};
 
-		Pickup::Run(defaultPickupIdentifiersToDataMap, pickupInstanceIdentifiersToDataMap);
+		Pickup::Run(defaultPickupIdentifiersToDataMap, pickupInstanceIdentifiersToDataMap, 1, true);
 
 		// Hook function to display text on title screen
 		oFUN_00744a40 = (tFUN_Void_Int)mem::TrampHook32((BYTE*)0x744A40, (BYTE*)hkFUN_00744a40, 6);

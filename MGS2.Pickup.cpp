@@ -29,6 +29,13 @@ namespace MGS2::Pickup {
 
 	static std::map<PickupInstanceIdentifiers, PickupInstanceData> PickupInstanceIdentifiersToDataMap;
 
+	// INT_MIN means do not replace the drop amount
+	static int NPCAmmoDropAmountReplacement = INT_MIN;
+	// (Could make a system where you can set the NPC item drop data for each item separately, but this will do)
+
+	// For items dropped by Snake to Raiden that could be considered integral to the Harrier and Tengu fights
+	bool DoNotAlterItemsDroppedBySnakeToRaiden = false;
+
 	// Account for areas that have slightly different variations under a different code
 	static std::string GetMainAreaCode(std::string areaCode) {
 		auto areaCodeIt = AreaVariationToAreaCodeMap.find(areaCode);
@@ -73,6 +80,22 @@ namespace MGS2::Pickup {
 			PickupAddresses pickupAddresses(param_1);
 			PickupSpawnType newPickupSpawnType = PickupSpawnType::Regular;
 
+			// 1 if pickup is will eventually despawn with time (~ dropped by enemy / by Snake to Raiden), 0 if it does not
+			// Items dropped by guards do not have to be checked for specific instance changes
+			int& isTimedPickup = *(int*)(param_1 + 0xA8);
+
+			// If this is an item dropped by Snake to Raiden and we do not want to alter those,
+			// just return here
+			if (DoNotAlterItemsDroppedBySnakeToRaiden
+				&& (isTimedPickup == 1) // to check if it is a dropped item
+				&& ( (strcmp(Mem::AreaCode, "w25a") == 0) && (pickupAddresses.Id == 7)) // stinger ammo dropped by Snake during the Harrier fight 
+					|| (Mem::Progress() > 396) // For items dropped by Snake during Tengu fights
+					){
+				return result;
+			}
+
+
+
 			// Set the new default pickup data, if we have it for this pickup type
 
 			auto newDefaultPickupDataIt = DefaultPickupIdentifiersToDataMap.find(
@@ -83,10 +106,6 @@ namespace MGS2::Pickup {
 			}
 
 			// Set the new pickup instance data if it exists (overriding the new default data as needed)
-
-			// 1 if pickup is will eventually despawn with time (~ dropped by guard), 0 if it does not
-			// Items dropped by guards do not have to be checked for specific instance changes
-			int& isTimedPickup = *(int*)(param_1 + 0xA8);
 
 			if (isTimedPickup == 0) {
 
@@ -114,6 +133,11 @@ namespace MGS2::Pickup {
 						pickupZ = pickupInstanceDataIt->second.Z;
 					}
 				}
+			}
+			// For if we want change the ammo amount dropped by an NPC
+			else if (NPCAmmoDropAmountReplacement > INT_MIN
+				&& pickupAddresses.Category != PickupCategory::Item) {
+				pickupAddresses.Amount = NPCAmmoDropAmountReplacement;
 			}
 
 			switch (newPickupSpawnType)
@@ -184,7 +208,8 @@ namespace MGS2::Pickup {
 
 	static bool HasNewPickupData() {
 		return !DefaultPickupIdentifiersToDataMap.empty()
-			|| !PickupInstanceIdentifiersToDataMap.empty();
+			|| !PickupInstanceIdentifiersToDataMap.empty()
+			|| (NPCAmmoDropAmountReplacement > INT_MIN);
 	}
 
 	void Run(CSimpleIniA& ini) {
@@ -272,10 +297,15 @@ namespace MGS2::Pickup {
 		}
 	}
 
-	void Run(default_pickup_ids_to_data_map defaultPickupIdentifiersToDataMap, pickup_instance_ids_to_data_map pickupInstanceIdentifiersToDataMap)
+	void Run(default_pickup_ids_to_data_map defaultPickupIdentifiersToDataMap, pickup_instance_ids_to_data_map pickupInstanceIdentifiersToDataMap,
+		int npcAmmoDropAmountReplacement, bool doNotAlterItemsDroppedBySnakeToRaiden)
 	{
 		DefaultPickupIdentifiersToDataMap = defaultPickupIdentifiersToDataMap;
 		PickupInstanceIdentifiersToDataMap = pickupInstanceIdentifiersToDataMap;
+
+		NPCAmmoDropAmountReplacement = npcAmmoDropAmountReplacement;
+
+		DoNotAlterItemsDroppedBySnakeToRaiden = doNotAlterItemsDroppedBySnakeToRaiden;
 
 		// Hook function to item box spawn if there is a need
 		if (HasNewPickupData()) {
