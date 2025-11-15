@@ -115,10 +115,24 @@ namespace MGS2::AlertModeMechanics {
 
 		try_mgs2
 
-			const char* areaCode = Mem::AreaCode;
+			if (Mem::Stage() == None) { // title screen etc.
+				// Reset these variables to avoid unintended behavior on starting a game after quitting a game etc.
+				PrevAreaCode = "";
+				PrevRespawnAreaCode = "";
+				PrevContinueAmount = -1;
+				CautionAreasPassed.clear();
+				AreaStartCautionAreasPassed.clear();
+				AreaStartCautionTime = 0;
+				AreaStartAlertMode = AlertMode::Infiltration;
 
-			if (Mem::Stage() == None
-				|| (strcmp(areaCode, "tales") == 0) // = snake tales "cutscenes"
+				AlertModeManager::AlertTime = 0;
+				AlertModeManager::AreaCautionTime = 0;
+				return;
+			} 
+
+			const char* areaCode = Mem::AreaCode;
+			
+			if ((strcmp(areaCode, "tales") == 0) // = snake tales "cutscenes"
 				|| !AlertModeManager::CanActivateAlertMode()) {
 				return;
 			}
