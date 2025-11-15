@@ -31,7 +31,17 @@ namespace MGS2::Challenge {
 
 		mem::PatchSet patchSet = mem::PatchSet{
 			// Set the chaff timer to 5s
-			mem::Patch((void*)0x957349, "\x2C\x01")
+			{mem::Patch((void*)0x957349, "\x2C\x01")},
+
+			// Remove lines of code that overwrite stats stored at section start
+			// (this way, using a continue will have those stats reset to what they were at the checkpoint)
+			{mem::Patch((void*)0x877E7E, "\x90\x90\x90\x90\x90")}, // ammo used
+			{mem::Patch((void*)0x877E90, "\x90\x90\x90\x90\x90")}, // alerts
+			{mem::Patch((void*)0x877EA4, "\x90\x90\x90\x90\x90")}, // kills
+			{mem::Patch((void*)0x877EB8, "\x90\x90\x90\x90\x90")}, // damage taken
+			{mem::Patch((void*)0x877ECD, "\x90\x90\x90\x90\x90")}, // rations used
+			{mem::Patch((void*)0x877EE1, "\x90\x90\x90\x90\x90")}, // clearing escapes
+			{mem::Patch((void*)0x877F1B, "\x90\x90\x90\x90\x90")}, // mech kills
 		};
 		patchSet.Patch();
 
