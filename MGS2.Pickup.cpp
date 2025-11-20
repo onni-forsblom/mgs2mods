@@ -88,8 +88,10 @@ namespace MGS2::Pickup {
 			// just return here
 			if (DoNotAlterItemsDroppedBySnakeToRaiden
 				&& (isTimedPickup == 1) // to check if it is a dropped item
-				&& ( (strcmp(Mem::AreaCode, "w25a") == 0) && (pickupAddresses.Id == 7)) // stinger ammo dropped by Snake during the Harrier fight 
+				&& (
+					( (strcmp(Mem::AreaCode, "w25a") == 0) && (pickupAddresses.Id == 7)) // stinger ammo dropped by Snake during the Harrier fight 
 					|| (Mem::Progress() > 396) // For items dropped by Snake during Tengu fights
+					) 
 					){
 				return result;
 			}
