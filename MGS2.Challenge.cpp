@@ -42,6 +42,18 @@ namespace MGS2::Challenge {
 			{mem::Patch((void*)0x877ECD, "\x90\x90\x90\x90\x90")}, // rations used
 			{mem::Patch((void*)0x877EE1, "\x90\x90\x90\x90\x90")}, // clearing escapes
 			{mem::Patch((void*)0x877F1B, "\x90\x90\x90\x90\x90")}, // mech kills
+
+			// Change the ranking system to count continues as three saves when calculating #1 rank
+			{mem::Patch((void*)0x945BDF, "\x6B\xC0\x03\x03\x41\x20\x83\xF8\x08\x7F\x37\x83\x79\x24\x00\x75\x31", 17)},
+
+			// Change the ranking system to count continues as three saves when calculating #2 rank
+			{mem::Patch((void*)0x945C42, "\x6B\xD2\x03\x03\x51\x20\x83\xFA\x10\x7F\x21\x83\x79\x24\x00\x75\x1B", 17)},
+
+			// Change the ranking system to ignore continues when calculating #3 rank
+			{mem::Patch((void*)0x945C88, "\x90\x90\x90\x90\x90\x90\x90")},
+
+			// Change the ranking system to ignore continues when calculating #4 rank
+			{mem::Patch((void*)0x945CC1, "\x90\x90\x90\x90\x90\x90\x90")}
 		};
 		patchSet.Patch();
 
