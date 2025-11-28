@@ -15,12 +15,20 @@ namespace MGS2::EventLoadout {
 	static bool ResetAmmoAfterSpecificFights = false;
 	// Basically item amounts recorded at the start of the fight and reset to post-battle
 	std::vector<ItemData> FightStartItemData;
+	// Refill ammo for obtained weapons before the first Tengu fight (currently just intended for a challenge mod)
+	static bool RefillWeaponsBeforeTengu = false;
 
 	// If we want to spawn the version of Shell 2 core with guards after meeting the president
 	static bool SpawnGuardsAfterPrez = false;
 	const char* Shell2Core1FPreEmmaAreaCode = "w31a";
 	const char* Shell2Core1FEmmaAreaCode = "w31d";
 	const int PostPrezCodecEndProgress = 241;
+
+	// Currently used arrays for ammo/equipment amount/capacity for easy handling later
+	static short* AmmoAmountArray;
+	static short* AmmoCapacityArray;
+	static short* EquipmentAmountArray;
+	static short* EquipmentCapacityArray;
 
 	static const std::unordered_map<std::string, Stage> NameToStageMap{
 		{"tanker", Stage::Tanker},
@@ -121,13 +129,11 @@ namespace MGS2::EventLoadout {
 
 	static stage_to_progress_to_loadout_u_map StageToProgressToLoadoutMap;
 
+
 	static void SetItemsData(std::vector<ItemData> itemsData, bool isWeapons = true, bool setStoredItemsToo = false /* item values that are stored between area loads / reset to on continue */) {
 		
-		// Get either the weapon or equipment inventory as desired
-		short* inventoryPtr = isWeapons ? ((short*)*Mem::WeaponData) : ((short*)*Mem::ItemData);
-
-		// The value to add to the item amount address to get the item max capacity address
-		size_t maxOffset = isWeapons ? Mem::WeaponMaxOffset : Mem::ItemMaxOffset;
+		// Get either the weapon or equipment amount array as desired
+		short* amountArray = isWeapons ? AmmoAmountArray : EquipmentAmountArray;
 
 		for (auto &itemData : itemsData) {
 			const int maxItemNumber = 40; // No items beyond this number
@@ -139,20 +145,21 @@ namespace MGS2::EventLoadout {
 			// -2 indicates we do not want to change the value
 
 			if (itemData.Amount != -2) {
-				inventoryPtr[itemData.Number] = itemData.Amount;
+				amountArray[itemData.Number] = itemData.Amount;
 
 				if (setStoredItemsToo) {
 					const int storedItemOffset = 0x1598;
-					short* storedInventoryPtr = (short*)((char*)inventoryPtr + storedItemOffset);
-					storedInventoryPtr[itemData.Number] = itemData.Amount;
+					short* storedAmountArray = (short*)((char*)amountArray + storedItemOffset);
+					storedAmountArray[itemData.Number] = itemData.Amount;
 				}
 			}
 
 			// Calculate the max capacity address for the item and set the value
 			// -1 indicates we do not want to change the value
 			if (itemData.Capacity != -1) {
-				short* inventoryCapacityPtr = (short*)((char*)inventoryPtr + maxOffset);
-				inventoryCapacityPtr[itemData.Number] = itemData.Capacity;
+				// Get either the weapon or equipment capacity array as desired, and then set the proper value
+				short* capacityArray = isWeapons ? AmmoCapacityArray : EquipmentCapacityArray;
+				capacityArray[itemData.Number] = itemData.Capacity;
 			}
 		}
 	}
@@ -203,9 +210,13 @@ namespace MGS2::EventLoadout {
 		for (int weaponNumber : weaponNumbers) {
 			ItemData itemData;
 			itemData.Number = weaponNumber;
-			itemData.Amount = ((short*)*Mem::WeaponData)[weaponNumber]; // The current ammo amount for the desired weapon
+			itemData.Amount = AmmoAmountArray[weaponNumber];
 			FightStartItemData.push_back(itemData);
 		}
+	}
+
+	static void HandleResetAmmoAfterSpecificFights(Stage stage, int progress) {
+		
 	}
 
 	// On load
@@ -228,8 +239,15 @@ namespace MGS2::EventLoadout {
 				return;
 			}
 
+			// Get currently used arrays for ammo/equipment amount/capacity for easy handling later
+			AmmoAmountArray = ((short*)*Mem::WeaponData);
+			AmmoCapacityArray = (short*)((char*)AmmoAmountArray + Mem::WeaponMaxOffset);
+			EquipmentAmountArray = ((short*)*Mem::ItemData);
+			EquipmentCapacityArray = (short*)((char*)EquipmentAmountArray + Mem::ItemMaxOffset); 
+
 			const int progress = Mem::Progress();
 
+			// (Could consider making this into a separate function)
 			if (ResetAmmoAfterSpecificFights){
 				if (stage == Stage::Plant) {
 					switch (progress)
@@ -279,6 +297,22 @@ namespace MGS2::EventLoadout {
 						break;
 					default:
 						break;
+					}
+				}
+			}
+
+			// (Could consider making this into a separate function too)
+			if (RefillWeaponsBeforeTengu
+				&& stage == Stage::Plant
+				&& progress == 389) // HF blade training flag
+			{
+				// Refill ammo for M9, Socom, PSG1(-T), RGB6, Nikita, Stinger, AK, M4 (if the player has the weapon)
+				const std::vector<int> weaponNumbers = {1, 3, 4, 19, 5, 6, 7, 15, 18};
+
+				for (int weaponNumber : weaponNumbers) {
+					short& weaponAmmo = AmmoAmountArray[weaponNumber];
+					if (weaponAmmo > -1) { // If has the weapon
+						weaponAmmo = AmmoCapacityArray[weaponNumber]; // Set the current amount to max capacity
 					}
 				}
 			}
@@ -587,13 +621,15 @@ namespace MGS2::EventLoadout {
 	}
 
 	void Run(stage_to_progress_to_loadout_u_map stageToProgressToLoadoutMap, bool needToHookForMainGCL, bool resetAmmoAfterSpecificFights,
-		bool spawnGuardsAfterPrez)
+		bool spawnGuardsAfterPrez, bool refillWeaponsBeforeTengu)
 	{
 		StageToProgressToLoadoutMap = stageToProgressToLoadoutMap;
 
 		ResetAmmoAfterSpecificFights = resetAmmoAfterSpecificFights;
 
 		SpawnGuardsAfterPrez = spawnGuardsAfterPrez;
+
+		RefillWeaponsBeforeTengu = refillWeaponsBeforeTengu;
 
 		// Hook function that activates on load
 		oFUN_00884ca0 = (tFUN_Void)mem::TrampHook32((BYTE*)0x884CA0, (BYTE*)hkFUN_00884ca0, 6);

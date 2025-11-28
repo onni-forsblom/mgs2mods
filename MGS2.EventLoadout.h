@@ -42,5 +42,5 @@ namespace MGS2::EventLoadout {
 
 	// For running EventLoadout from other mods
 	void Run(stage_to_progress_to_loadout_u_map stageToProgressToLoadoutMap, bool needToHookForMainGCL = true, bool resetAmmoAfterSpecificFights = false,
-		bool spawnGuardsAfterPrez = false);
+		bool spawnGuardsAfterPrez = false, bool refillWeaponsBeforeTengu = false);
 }
