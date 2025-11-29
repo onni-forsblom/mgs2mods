@@ -33,6 +33,12 @@ namespace MGS2::Challenge {
 			// Set the chaff timer to 5s
 			{mem::Patch((void*)0x957349, "\x2C\x01")},
 
+			// Set guard tranq sleep time to 40s
+			{mem::Patch((void*)0xF6000C, "\x60\x09")},
+
+			// Remove the code that changes guard tranq sleep time by difficulty
+			{mem::Patch((void*)0x42DF7D, "\x90\x90\x90\x90\x90")},
+
 			// Remove lines of code that overwrite stats stored at section start
 			// (this way, using a continue will have those stats reset to what they were at the checkpoint)
 			{mem::Patch((void*)0x877E7E, "\x90\x90\x90\x90\x90")}, // ammo used
