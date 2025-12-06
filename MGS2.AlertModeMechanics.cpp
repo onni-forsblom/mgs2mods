@@ -85,8 +85,9 @@ namespace MGS2::AlertModeMechanics {
 		// start alert mode 
 		else if (enemyCommStatus1 == 2) {
 			AlertModeManager::StoredAlertMode = AlertMode::Alert;
-			// also increment the alert amount stat (this address is also used by the Stats mod, move to a separate header file?)
-			*(short*)(*Mem::MainGameStats + 0x142) += 1;
+			// also increment the alert amount stat, both area and stored variable (this address is also used by the Stats mod, move to a separate header file?)
+			*(short*)(*Mem::MainGameStats + 0x142) += 1; // area alert stat
+			*(short*)(0x118C49A) += 1; // stored alert stat
 		}
 		// Else, if an enemy was radioing a caution or alarmed (but not necessarily radioing an alert),
 		// start caution mode
